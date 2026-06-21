@@ -9,6 +9,19 @@
 #define PCGTOOLSET_EXTERNAL_MODIFICATION EPCGChangeType::ExternalModification
 #endif
 
+// [5.7 port] On 5.8 the node-edit tools build a PCGUtils::FScopedCall to capture per-node
+// errors/warnings and re-raise them to the tool caller via Graph::RaiseScopedErrors(ScopedCall).
+// On 5.7 the FScopedCall ctor takes a non-null const IPCGElement& owner (it is a reference, not a
+// pointer), so the "null-owner" profiling scope these tools rely on cannot be constructed; the
+// ScopedCall variable is therefore #if'd out of existence on 5.7. This macro routes the re-raise
+// call so it never references the (non-existent) ScopedCall variable on 5.7 and degrades to a
+// no-op there. The tools still function — they just don't surface PCG's internal scoped messages.
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+#define PCGTOOLSET_RAISE_SCOPED_ERRORS() do {} while (0)
+#else
+#define PCGTOOLSET_RAISE_SCOPED_ERRORS() Graph::RaiseScopedErrors(ScopedCall)
+#endif
+
 #include "PCGToolsetLibraryCore.h"
 #include "PCGComponent.h"
 #include "PCGGraph.h"
@@ -550,8 +563,8 @@ UPCGNode* UPCGToolset::AddNode(
 	const int32 XPositionIdx,
 	const int32 YPositionIdx)
 {
+	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null. FScopedCallOutputDevice ctor/dtor are not exported in 5.7, so its declaration is guarded out too (it is only consumed by FScopedCall).
 	PCGUtils::FScopedCallOutputDevice OutputDevice;
-	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null
 	PCGUtils::FScopedCall ScopedCall(nullptr, nullptr, OutputDevice);
 	#endif
 
@@ -579,7 +592,7 @@ UPCGNode* UPCGToolset::AddNode(
 	if (!CreatedNode)
 	{
 		Transaction.Cancel();
-		Graph::RaiseScopedErrors(ScopedCall);
+		PCGTOOLSET_RAISE_SCOPED_ERRORS();
 		FString ErrorMessage = FString::Format(TEXT("Unable to create node with type '{0}'."), {NativeNodeType});
 		UKismetSystemLibrary::RaiseScriptError(ErrorMessage);
 		return nullptr;
@@ -587,7 +600,7 @@ UPCGNode* UPCGToolset::AddNode(
 
 	auto OnErrorCleanup = [&]()
 	{
-		Graph::RaiseScopedErrors(ScopedCall);
+		PCGTOOLSET_RAISE_SCOPED_ERRORS();
 		Transaction.Cancel();
 		Graph->RemoveNode(CreatedNode);
 	};
@@ -634,8 +647,8 @@ UPCGNode* UPCGToolset::AddSubgraphNode(
 {
 	using namespace PCGToolsetLibrary;
 
+	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null. FScopedCallOutputDevice ctor/dtor are not exported in 5.7, so its declaration is guarded out too (it is only consumed by FScopedCall).
 	PCGUtils::FScopedCallOutputDevice OutputDevice;
-	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null
 	PCGUtils::FScopedCall ScopedCall(nullptr, nullptr, OutputDevice);
 	#endif
 
@@ -658,7 +671,7 @@ UPCGNode* UPCGToolset::AddSubgraphNode(
 	UPCGNode* CreatedNode = Graph->AddNodeOfType(SubgraphSettings);
 	if (!CreatedNode)
 	{
-		Graph::RaiseScopedErrors(ScopedCall);
+		PCGTOOLSET_RAISE_SCOPED_ERRORS();
 		Transaction.Cancel();
 		UKismetSystemLibrary::RaiseScriptError(TEXT("Unable to create subgraph node."));
 		return nullptr;
@@ -666,7 +679,7 @@ UPCGNode* UPCGToolset::AddSubgraphNode(
 
 	auto OnErrorCleanup = [&]()
 	{
-		Graph::RaiseScopedErrors(ScopedCall);
+		PCGTOOLSET_RAISE_SCOPED_ERRORS();
 		Transaction.Cancel();
 		Graph->RemoveNode(CreatedNode);
 	};
@@ -716,8 +729,8 @@ bool UPCGToolset::UpdateNode(UPCGNode* Node, const FString& JsonParams, const FS
 {
 	using namespace PCGToolsetLibrary;
 
+	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null. FScopedCallOutputDevice ctor/dtor are not exported in 5.7, so its declaration is guarded out too (it is only consumed by FScopedCall).
 	PCGUtils::FScopedCallOutputDevice OutputDevice;
-	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null
 	PCGUtils::FScopedCall ScopedCall(nullptr, nullptr, OutputDevice);
 	#endif
 
@@ -750,7 +763,7 @@ bool UPCGToolset::UpdateNode(UPCGNode* Node, const FString& JsonParams, const FS
 			if (!ensure(SubgraphInterface && SubgraphInterface->IsInstance()))
 			{
 				Transaction.Cancel();
-				Graph::RaiseScopedErrors(ScopedCall);
+				PCGTOOLSET_RAISE_SCOPED_ERRORS();
 				UKismetSystemLibrary::RaiseScriptError(FString::Format(TEXT("Subgraph must be instantiated: {0}"), {Node->GetName()}));
 				return false;
 			}
@@ -761,7 +774,7 @@ bool UPCGToolset::UpdateNode(UPCGNode* Node, const FString& JsonParams, const FS
 			// @todo_pcg: params not being set properly should return success: true but with warnings
 			if (!Graph::SetGraphInstanceParams(SubgraphInstance, JsonParams))
 			{
-				Graph::RaiseScopedErrors(ScopedCall);
+				PCGTOOLSET_RAISE_SCOPED_ERRORS();
 				Transaction.Cancel();
 				UKismetSystemLibrary::RaiseScriptError(FString::Format(TEXT("Could not set params on node '{0}'."), {Node->GetName()}));
 				return false;
@@ -769,7 +782,7 @@ bool UPCGToolset::UpdateNode(UPCGNode* Node, const FString& JsonParams, const FS
 		}
 		else if (!UToolsetLibrary::SetObjectProperties(Node->GetSettings(), JsonParams, EBypassContainerCheck::Yes))
 		{
-			Graph::RaiseScopedErrors(ScopedCall);
+			PCGTOOLSET_RAISE_SCOPED_ERRORS();
 			Transaction.Cancel();
 			UKismetSystemLibrary::RaiseScriptError(FString::Format(TEXT("Could not set params on node '{0}'."), {Node->GetName()}));
 			return false;

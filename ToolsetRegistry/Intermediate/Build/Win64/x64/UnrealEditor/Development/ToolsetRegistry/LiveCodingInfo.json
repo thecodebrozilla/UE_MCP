@@ -2,6 +2,7 @@
 	"RemapUnityFiles": 
 	{
 		"Module.ToolsetRegistry.cpp.obj": [
+			"PythonTestRunnerStub.gen.cpp.obj",
 			"ReferenceConverter.gen.cpp.obj",
 			"ToolCallAsyncResult.gen.cpp.obj",
 			"ToolCallAsyncResultFutureHandler.gen.cpp.obj",
@@ -16,6 +17,7 @@
 			"UToolsetRegistry.gen.cpp.obj",
 			"PerModuleInline.gen.cpp.obj",
 			"KismetSystemLibraryCompat.cpp.obj",
+			"PythonTestRunnerStub.cpp.obj",
 			"AgentSkill.cpp.obj",
 			"ColorConverter.cpp.obj",
 			"FunctionLibraryToolset.cpp.obj",

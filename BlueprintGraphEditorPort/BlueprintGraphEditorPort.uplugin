@@ -1,0 +1,20 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Blueprint Graph Editor (5.8 backport)",
+	"Description": "Backport of UE 5.8's UBlueprintGraphEditor / FBlueprintGraphPin (the BlueprintEditorLibrary graph-authoring scripting API) for UE 5.7. Exposes unreal.BlueprintGraphEditor / unreal.BlueprintGraphPin used by EditorToolset's blueprint.py.",
+	"Category": "Other",
+	"CreatedBy": "Epic Games, Inc. (backported)",
+	"EditorOnly": true,
+	"CanContainContent": false,
+	"IsExperimentalVersion": true,
+	"EnabledByDefault": false,
+	"Modules": [
+		{
+			"Name": "BlueprintGraphEditorPort",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}

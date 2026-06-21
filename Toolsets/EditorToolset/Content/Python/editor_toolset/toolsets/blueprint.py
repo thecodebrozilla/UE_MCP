@@ -1,5 +1,12 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 
+# [5.7 port] Defer annotation evaluation (PEP 563) so tool methods/params that
+# reference 5.8-only `unreal.*` types (e.g. K2Node_CreateDelegate,
+# BlueprintFunctionInfo, BlueprintVariableReplication) don't raise AttributeError
+# at class-definition time. tool_call() then skips just those tools on engines
+# where the type is missing, letting the rest of the toolset register.
+from __future__ import annotations
+
 import collections
 import dataclasses
 import unreal
@@ -15,11 +22,170 @@ _ENGINE_MACROS_OBJECT = 'StandardMacros'
 _DISPATCHER_PREFIX = 'Default|EventDispatcher'
 _CUSTOM_EVENT_PREFIX = 'AddEvent|Custom|'
 
+
+def _set_node_pos(node: unreal.EdGraphNode, x: int, y: int) -> None:
+    # [5.7 port] EdGraphNode.set_node_pos() is 5.8-only, and node_pos_x/_y are not
+    # reliably exposed as Python properties on 5.7. Node position is purely
+    # cosmetic (graph layout) and create_node_from_name already places nodes at
+    # the requested position, so try the available APIs and no-op if none work.
+    x, y = int(x), int(y)
+    try:
+        node.set_node_pos(unreal.IntPoint(x, y))  # 5.8 API
+        return
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    for attr_x, attr_y in (('node_pos_x', 'node_pos_y'), ('NodePosX', 'NodePosY')):
+        try:
+            node.set_editor_property(attr_x, x)
+            node.set_editor_property(attr_y, y)
+            return
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+
+
+def _list_macro_graph_names(macro_blueprint: unreal.Blueprint) -> list[str]:
+    # [5.7 port] unreal.BlueprintEditorLibrary.list_graph_names() is 5.8-only.
+    # Read the macro library's macro graphs directly via reflection; fall back to
+    # the 5.8 API if present, else degrade to no macros (non-macro nodes still work).
+    try:
+        return list(unreal.BlueprintEditorLibrary.list_graph_names(macro_blueprint))
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    names: list[str] = []
+    for prop in ('macro_graphs', 'MacroGraphs'):
+        try:
+            graphs = macro_blueprint.get_editor_property(prop)
+        except Exception:  # pylint: disable=broad-exception-caught
+            continue
+        for g in graphs or []:
+            try:
+                names.append(g.get_name())
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+        if names:
+            break
+    return names
+
+
+def _list_event_dispatcher_names(blueprint: unreal.Blueprint) -> list[str]:
+    # [5.7 port] unreal.BlueprintEditorLibrary.list_event_dispatchers() is 5.8-only.
+    # Degrade to none if unavailable (event-dispatcher nodes won't be offered).
+    try:
+        return list(unreal.BlueprintEditorLibrary.list_event_dispatchers(blueprint))
+    except Exception:  # pylint: disable=broad-exception-caught
+        return []
+
+
+def _list_member_variable_names_compat(blueprint: unreal.Blueprint) -> list[str]:
+    # [5.7 port] unreal.BlueprintEditorLibrary.list_member_variable_names() is
+    # 5.8-only and UBlueprint.NewVariables is protected from Python reflection on
+    # 5.7. The bundled BlueprintGraphEditorPort plugin provides a C++ UFUNCTION
+    # that reads NewVariables directly; prefer it, then fall back to the 5.8 API.
+    try:
+        return [str(n) for n in unreal.BlueprintGraphEditor.list_member_variable_names(blueprint)]
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    try:
+        return [str(v) for v in unreal.BlueprintEditorLibrary.list_member_variable_names(blueprint, False)]
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    names: list[str] = []
+    for prop in ('new_variables', 'NewVariables'):
+        try:
+            variables = blueprint.get_editor_property(prop)
+        except Exception:  # pylint: disable=broad-exception-caught
+            continue
+        for v in variables or []:
+            try:
+                names.append(str(v.get_editor_property('var_name')))
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+        if names:
+            break
+    return names
+
+
+def _list_graph_objects_compat(blueprint: unreal.Blueprint) -> list:
+    # [5.7 port] unreal.BlueprintEditorLibrary.list_graphs() is 5.8-only.
+    # In 5.7, UBlueprint properties UbergraphPages / FunctionGraphs / MacroGraphs /
+    # DelegateSignatureGraphs are all marked protected in the Python reflection layer
+    # and cannot be read via get_editor_property().  The only reliable 5.7 fallback is
+    # find_event_graph() which returns the single ubergraph (EventGraph).  Function
+    # graphs, macro graphs, and delegate graphs are NOT enumerable from Python on 5.7
+    # without a C++ UFUNCTION that calls UBlueprint::GetAllGraphs() -- which the
+    # bundled BlueprintGraphEditorPort plugin now provides (preferred path below).
+    try:
+        graphs = list(unreal.BlueprintGraphEditor.list_all_graphs(blueprint))
+        if graphs:
+            return graphs
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    try:
+        return list(unreal.BlueprintEditorLibrary.list_graphs(blueprint))
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    graphs: list = []
+    # Attempt property access (works on 5.8 if the 5.8 API path above missed for
+    # some reason; on 5.7 these silently fail and are skipped).
+    for prop in ('ubergraph_pages', 'function_graphs', 'macro_graphs', 'delegate_signature_graphs'):
+        try:
+            for g in blueprint.get_editor_property(prop) or []:
+                graphs.append(g)
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+    if graphs:
+        return graphs
+    # [5.7 port] Last resort: return at least the EventGraph so callers that only
+    # need "some graph to introspect" can proceed.  find_event_graph() is available
+    # in both 5.7 and 5.8.
+    try:
+        event_graph = unreal.BlueprintEditorLibrary.find_event_graph(blueprint)
+        if event_graph is not None:
+            graphs.append(event_graph)
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    return graphs
+
+
+def _node_title(node: unreal.EdGraphNode) -> str:
+    # [5.7 port] EdGraphNode.get_node_title() is 5.8-only. Fall back to the node's
+    # class name (minus the K2Node_ prefix) so introspection degrades instead of
+    # crashing.
+    try:
+        return ''.join(node.get_node_title().split())
+    except Exception:  # pylint: disable=broad-exception-caught
+        return type(node).__name__.replace('K2Node_', '')
+
+
+def _node_category(node: unreal.EdGraphNode) -> str:
+    # [5.7 port] EdGraphNode.get_node_category() is 5.8-only.
+    try:
+        return ''.join(node.get_node_category().split())
+    except Exception:  # pylint: disable=broad-exception-caught
+        return ''
+
+
+def _get_node_pos(node: unreal.EdGraphNode) -> unreal.IntPoint:
+    # [5.7 port] EdGraphNode.get_node_pos() is 5.8-only; read node_pos_x/_y if
+    # available, else default to the origin (position is cosmetic).
+    try:
+        return node.get_node_pos()
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    for attr_x, attr_y in (('node_pos_x', 'node_pos_y'), ('NodePosX', 'NodePosY')):
+        try:
+            return unreal.IntPoint(
+                int(node.get_editor_property(attr_x)), int(node.get_editor_property(attr_y)))
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+    return unreal.IntPoint(0, 0)
+
+
 def _get_node_type_id(node: unreal.EdGraphNode) -> str:
-    node_title = ''.join(node.get_node_title().split())
+    node_title = _node_title(node)
     if isinstance(node, unreal.K2Node_CustomEvent):
         return f'{_CUSTOM_EVENT_PREFIX}{node_title}'
-    node_category = ''.join(node.get_node_category().split())
+    node_category = _node_category(node)
     return f'{node_category}|{node_title}'
 
 
@@ -60,7 +226,7 @@ class _BlueprintCache:
         if not isinstance(bp, unreal.Blueprint):
             return cls._macros
         bp_editor = unreal.BlueprintGraphEditor.get_graph_editor(graph)
-        for name in unreal.BlueprintEditorLibrary.list_graph_names(bp):
+        for name in _list_macro_graph_names(bp):
             path = f'{_ENGINE_MACROS_PATH}.{_ENGINE_MACROS_OBJECT}.{name}'
             node = bp_editor.add_macro_node(path)  # type: ignore
             if isinstance(node, unreal.EdGraphNode):
@@ -107,7 +273,7 @@ class _BlueprintCache:
         # under Default|EventDispatcher{name} type_id.
         blueprint = unreal.Blueprint.cast(graph.get_outer())
         if blueprint:
-            for name in unreal.BlueprintEditorLibrary.list_event_dispatchers(blueprint):
+            for name in _list_event_dispatcher_names(blueprint):
                 entry.type_ids_by_category['Default'].append(f'{_DISPATCHER_PREFIX}{name}')
         cls._graph_node_types[graph_key] = entry
         return entry.type_ids_by_category
@@ -154,9 +320,8 @@ class _BlueprintCache:
         blueprint = unreal.Blueprint.cast(graph.get_outer())
         if not blueprint:
             return ''
-        var_names = sorted(
-            str(v) for v in unreal.BlueprintEditorLibrary.list_member_variable_names(blueprint, False))
-        graph_names = sorted(g.get_name() for g in unreal.BlueprintEditorLibrary.list_graphs(blueprint))
+        var_names = sorted(_list_member_variable_names_compat(blueprint))
+        graph_names = sorted(g.get_name() for g in _list_graph_objects_compat(blueprint))
         return f'{var_names}|{graph_names}'
 
 
@@ -240,7 +405,8 @@ class BlueprintTools(unreal.ToolsetDefinition):
         Returns:
             list of graphs in the Blueprint.
         """
-        return unreal.BlueprintEditorLibrary.list_graphs(blueprint)
+        # [5.7 port] unreal.BlueprintEditorLibrary.list_graphs() is 5.8-only; use compat helper.
+        return _list_graph_objects_compat(blueprint)
 
     @toolset_registry.tool_call
     @staticmethod
@@ -260,27 +426,30 @@ class BlueprintTools(unreal.ToolsetDefinition):
         assert bp_editor, f'Cannot find graph {graph_name} in Blueprint {blueprint}'
         return bp_editor.get_graph()
 
-    @toolset_registry.tool_call
-    @staticmethod
-    def list_functions(blueprint: unreal.Blueprint) -> list[unreal.BlueprintFunctionInfo]:
-        """Lists all functions visible on the Blueprint — locally defined plus
-        inheritable ones from the parent class chain and implemented interfaces.
+    # [5.7 port] unreal.BlueprintFunctionInfo is 5.8-only
+    # (and BlueprintEditorLibrary.list_functions/list_events do not exist in 5.7).
+    # @toolset_registry.tool_call
+    # @staticmethod
+    # def list_functions(blueprint: unreal.Blueprint) -> list[unreal.BlueprintFunctionInfo]:
+    #     """Lists all functions visible on the Blueprint — locally defined plus
+    #     inheritable ones from the parent class chain and implemented interfaces.
+    #
+    #     Args:
+    #         blueprint: The Blueprint asset to query.
+    #     """
+    #     return list(unreal.BlueprintEditorLibrary.list_functions(blueprint))
 
-        Args:
-            blueprint: The Blueprint asset to query.
-        """
-        return list(unreal.BlueprintEditorLibrary.list_functions(blueprint))
-
-    @toolset_registry.tool_call
-    @staticmethod
-    def list_events(blueprint: unreal.Blueprint) -> list[unreal.BlueprintFunctionInfo]:
-        """Lists all events visible on the Blueprint — locally defined custom events
-        plus inheritable events from the parent class chain and implemented interfaces.
-
-        Args:
-            blueprint: The Blueprint asset to query.
-        """
-        return list(unreal.BlueprintEditorLibrary.list_events(blueprint))
+    # [5.7 port] unreal.BlueprintFunctionInfo is 5.8-only
+    # @toolset_registry.tool_call
+    # @staticmethod
+    # def list_events(blueprint: unreal.Blueprint) -> list[unreal.BlueprintFunctionInfo]:
+    #     """Lists all events visible on the Blueprint — locally defined custom events
+    #     plus inheritable events from the parent class chain and implemented interfaces.
+    #
+    #     Args:
+    #         blueprint: The Blueprint asset to query.
+    #     """
+    #     return list(unreal.BlueprintEditorLibrary.list_events(blueprint))
 
     @toolset_registry.tool_call
     @staticmethod
@@ -295,23 +464,9 @@ class BlueprintTools(unreal.ToolsetDefinition):
             blueprint: The Blueprint asset to add the function to.
             graph_name: The name of the new function graph.
         """
-        events = BlueprintTools.list_events(blueprint)
-        if any(str(e.name) == graph_name and not e.is_implemented for e in events):
-            raise RuntimeError(
-                f'"{graph_name}" is an inherited event-shape function on {blueprint}; '
-                f'it must be placed as an event node rather than a function graph.')
-        functions = BlueprintTools.list_functions(blueprint)
-        matching = next((f for f in functions if str(f.name) == graph_name), None)
-        if matching and matching.is_implemented:
-            for g in BlueprintTools.list_graphs(blueprint):
-                if g.get_name() == graph_name:
-                    return g
-        if matching:
-            graph = unreal.BlueprintEditorLibrary.add_function_override(
-                blueprint, unreal.Name(graph_name))
-            if graph:
-                _BlueprintCache.invalidate(blueprint)
-                return graph
+        # [5.7 port] list_events/list_functions and add_function_override are
+        # 5.8-only; inherited-override detection is unavailable in 5.7, so we
+        # fall through to creating a plain new function graph.
         for g in BlueprintTools.list_graphs(blueprint):
             if g.get_name() == graph_name:
                 return g
@@ -339,27 +494,17 @@ class BlueprintTools(unreal.ToolsetDefinition):
         Returns:
             The event node.
         """
-        functions = BlueprintTools.list_functions(blueprint)
-        if any(str(f.name) == event_name and not f.is_implemented for f in functions):
-            raise RuntimeError(
-                f'"{event_name}" is an inherited function-shape override on {blueprint}; '
-                f'it must be placed as a function graph rather than an event node.')
-        events = BlueprintTools.list_events(blueprint)
-        matching = next((e for e in events if str(e.name) == event_name), None)
+        # [5.7 port] list_events/list_functions and add_event_override are
+        # 5.8-only; inherited-event override detection is unavailable in 5.7.
+        # Detect an already-placed event node by name, otherwise create a new
+        # custom event.
         event_graph = unreal.BlueprintEditorLibrary.find_event_graph(blueprint)
         if not event_graph:
             raise RuntimeError(f'Blueprint {blueprint} has no event graph.')
-        if matching and matching.is_implemented:
-            bp_editor = unreal.BlueprintGraphEditor.get_graph_editor(event_graph)
-            existing = bp_editor.find_event_node(unreal.Name(event_name))  # type: ignore
-            if existing:
-                return existing
-        if matching:
-            node = unreal.BlueprintEditorLibrary.add_event_override(
-                blueprint, unreal.Name(event_name), position)
-            if node:
-                _BlueprintCache.invalidate(blueprint)
-                return node
+        bp_editor = unreal.BlueprintGraphEditor.get_graph_editor(event_graph)
+        existing = bp_editor.find_event_node(unreal.Name(event_name))  # type: ignore
+        if existing:
+            return existing
         node = BlueprintTools.create_node(
             event_graph, f'{_CUSTOM_EVENT_PREFIX}{event_name}', position)
         _BlueprintCache.invalidate(blueprint)
@@ -380,7 +525,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
         graphs = BlueprintTools.list_graphs(blueprint)
         if not (graph_name in [g.get_name() for g in graphs]):
             raise RuntimeError(f'Graph {graph_name} does not exist')
-        dispatcher_names = [str(n) for n in unreal.BlueprintEditorLibrary.list_event_dispatchers(blueprint)]
+        dispatcher_names = _list_event_dispatcher_names(blueprint)  # [5.7 port] list_event_dispatchers is 5.8-only
         if graph_name in dispatcher_names:
             if not unreal.BlueprintEditorLibrary.remove_event_dispatcher(blueprint, unreal.Name(graph_name)):
                 raise RuntimeError(f'Event dispatcher "{graph_name}" not found in {blueprint}.')
@@ -553,24 +698,58 @@ class BlueprintTools(unreal.ToolsetDefinition):
         return BlueprintTools._pin_to_id(pin)
 
     @staticmethod
-    def _list_pins(node: unreal.EdGraphNode, direction: unreal.EdGraphPinDirection) -> list[unreal.BlueprintGraphPin]:
-        return [p for p in node.list_all_pins() if p.get_pin_direction() == direction]
+    def _list_all_pins_compat(node: unreal.EdGraphNode) -> list[unreal.BlueprintGraphPin]:
+        # [5.7 port] EdGraphNode.list_all_pins() is 5.8-only. The bundled
+        # BlueprintGraphEditorPort plugin provides UBlueprintGraphPinLibrary.list_node_pins(),
+        # which wraps the node's native pins (Node->Pins is public C++) as
+        # FBlueprintGraphPin proxies — restoring full pin enumeration on 5.7.
+        try:
+            return list(node.list_all_pins())  # 5.8 native method, if present
+        except AttributeError:
+            pass
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        try:
+            return list(unreal.BlueprintGraphPinLibrary.list_node_pins(node))
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        return []
 
+    @staticmethod
+    def _list_pins(node: unreal.EdGraphNode, direction: unreal.EdGraphPinDirection) -> list[unreal.BlueprintGraphPin]:
+        # [5.7 port] node.list_all_pins() is 5.8-only; route through compat helper.
+        return [p for p in BlueprintTools._list_all_pins_compat(node) if p.get_pin_direction() == direction]
 
     @staticmethod
     def _resolve_pin(pin_id: PinID) -> unreal.BlueprintGraphPin:
+        # [5.7 port] On 5.7 the FBlueprintGraphPin struct fields cannot be set from Python,
+        # so we cannot reconstruct a pin from a PinID without list_all_pins.
+        # Fall back to enumerating pins; this works on 5.8 and degrades on 5.7 for nodes
+        # where list_all_pins is unavailable (raises RuntimeError so the caller can catch).
         pins = BlueprintTools._list_pins(pin_id.node, pin_id.direction)
         if pin_id.index_id >= len(pins):
-            raise RuntimeError(f'PinID index_id {pin_id.index_id} out of range for node {pin_id.node}')
+            raise RuntimeError(
+                f'PinID index_id {pin_id.index_id} out of range for node {pin_id.node} '
+                f'(found {len(pins)} pins; on UE 5.7 pin enumeration requires a ListAllPins '
+                f'UFUNCTION in the BlueprintGraphEditorPort plugin)')
         return pins[pin_id.index_id]
 
     @staticmethod
     def _pin_to_id(pin: unreal.BlueprintGraphPin) -> PinID:
+        # [5.7 port] FBlueprintGraphPin.pin_index is not accessible from Python.
+        # Fall back to scanning _list_pins to find the index by pin name.
+        # On 5.7 this also fails for nodes where list_all_pins is unavailable,
+        # causing StopIteration; tools that return PinIDs will surface this error.
         node = pin.get_owning_node()
         direction = pin.get_pin_direction()
         pin_id = PinID()
         pin_id.node = node
         pin_id.direction = direction
+        # Cache pin_name for potential future use by _resolve_pin (if C++ support added)
+        try:
+            pin_id.pin_name = str(pin.get_pin_name())
+        except Exception:  # pylint: disable=broad-exception-caught
+            pin_id.pin_name = ''
         pin_id.index_id = next(
             i for i, p in enumerate(BlueprintTools._list_pins(node, direction))
             if p.get_pin_name() == pin.get_pin_name()
@@ -611,7 +790,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
         node_info = NodeInfo()
         node_info.type_id = _get_node_type_id(node)
         node_info.node = node
-        node_info.position = node.get_node_pos()
+        node_info.position = _get_node_pos(node)
         for direction, bucket in (
             (unreal.EdGraphPinDirection.EGPD_INPUT, node_info.input_pins),
             (unreal.EdGraphPinDirection.EGPD_OUTPUT, node_info.output_pins),
@@ -629,52 +808,57 @@ class BlueprintTools(unreal.ToolsetDefinition):
 
     @toolset_registry.tool_call
     @staticmethod
-    def get_create_event_function(node: unreal.K2Node_CreateDelegate) -> str:
+    def get_create_event_function(node: unreal.EdGraphNode) -> str:
         """Returns the function currently bound to a Create Event node.
 
         Args:
-            node: The Create Event node.
+            node: The Create Event node (a K2Node_CreateDelegate).
 
         Returns:
             The bound function name, or empty string if none is set.
         """
-        name = unreal.BlueprintEditorLibrary.get_create_delegate_function(node)
-        return '' if name.is_none() else str(name)
+        # [5.7 port] unreal.K2Node_CreateDelegate and the 5.8
+        # BlueprintEditorLibrary.get_create_delegate_function are not exposed on 5.7;
+        # the bundled BlueprintGraphEditorPort plugin provides the operation as a
+        # compat shim that Cast<UK2Node_CreateDelegate>s the node internally.
+        BlueprintTools._ensure_create_delegate_node(node)
+        return str(unreal.EditorToolsetCompatLibrary.get_create_delegate_function(node))
 
     @toolset_registry.tool_call
     @staticmethod
-    def set_create_event_function(node: unreal.K2Node_CreateDelegate, function_name: str) -> None:
+    def set_create_event_function(node: unreal.EdGraphNode, function_name: str) -> None:
         """Binds a function to a Create Event node.
 
         Use list_compatible_event_functions to find valid function names.
 
         Args:
-            node: The Create Event node.
+            node: The Create Event node (a K2Node_CreateDelegate).
             function_name: The name of the function to bind.
         """
+        BlueprintTools._ensure_create_delegate_node(node)
         compatible = BlueprintTools.list_compatible_event_functions(node)
         if function_name not in compatible:
             raise RuntimeError(
                 f'"{function_name}" is not a compatible function. '
                 f'Valid functions: {compatible}')
-        unreal.BlueprintEditorLibrary.set_create_delegate_function(node, unreal.Name(function_name))
-        if unreal.BlueprintEditorLibrary.get_create_delegate_function(node).is_none():
+        if not unreal.EditorToolsetCompatLibrary.set_create_delegate_function(node, function_name):
             raise RuntimeError(f'Failed to bind "{function_name}" to the Create Event node.')
 
     @toolset_registry.tool_call
     @staticmethod
-    def list_compatible_event_functions(node: unreal.K2Node_CreateDelegate) -> list[str]:
+    def list_compatible_event_functions(node: unreal.EdGraphNode) -> list[str]:
         """Lists functions that can be bound to a Create Event node.
 
         Args:
-            node: The Create Event node.
+            node: The Create Event node (a K2Node_CreateDelegate).
 
         Returns:
             A list of function names valid for binding.
         """
+        BlueprintTools._ensure_create_delegate_node(node)
         BlueprintTools._ensure_delegate_connected(node)
         return [str(n) for n in
-                unreal.BlueprintEditorLibrary.list_compatible_functions_for_delegate(node)]
+                unreal.EditorToolsetCompatLibrary.list_compatible_functions_for_delegate(node)]
 
     @toolset_registry.tool_call
     @staticmethod
@@ -711,9 +895,20 @@ class BlueprintTools(unreal.ToolsetDefinition):
                 continue
             if node_class and not unreal.MathLibrary.class_is_child_of(node.get_class(), node_class):
                 continue
-            if entry_points_only and not (
-                    node.find_then_pin().is_valid() and not node.find_execute_pin().is_valid()):
-                continue
+            if entry_points_only:
+                # [5.7 port] find_then_pin()/find_execute_pin() are 5.8-only methods.
+                # Probe via _list_all_pins_compat: an entry point has a 'then' output
+                # but no 'execute' input.
+                try:
+                    has_then = node.find_then_pin().is_valid()
+                    has_execute = node.find_execute_pin().is_valid()
+                except AttributeError:
+                    out_names = {str(p.get_pin_name()) for p in BlueprintTools._list_pins(node, unreal.EdGraphPinDirection.EGPD_OUTPUT)}
+                    in_names = {str(p.get_pin_name()) for p in BlueprintTools._list_pins(node, unreal.EdGraphPinDirection.EGPD_INPUT)}
+                    has_then = 'then' in out_names
+                    has_execute = 'execute' in in_names
+                if not (has_then and not has_execute):
+                    continue
             results.append(node)
         return results
 
@@ -740,7 +935,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
             if key in visited:
                 continue
             visited[key] = current
-            for pin in current.list_all_pins():
+            for pin in BlueprintTools._list_all_pins_compat(current):  # [5.7 port] list_all_pins() is 5.8-only
                 for connected_pin in pin.list_connected_pins():
                     neighbour = connected_pin.get_owning_node()
                     if neighbour.get_path_name() not in visited:
@@ -911,7 +1106,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
             else:
                 node = bp_editor.create_node_from_name(type_id, unreal.Vector2D(pos.x, pos.y), [], declaring_class) # type: ignore
         assert isinstance(node, unreal.EdGraphNode), f'The node could not be created / {type_id} does not exist'
-        node.set_node_pos(pos)
+        _set_node_pos(node, pos.x, pos.y)
         return node
 
     @toolset_registry.tool_call
@@ -949,11 +1144,11 @@ class BlueprintTools(unreal.ToolsetDefinition):
         bp_editor = unreal.BlueprintGraphEditor.get_graph_editor(graph)
         if not isinstance(bp_editor, unreal.BlueprintGraphEditor):
             raise RuntimeError(f'Could not get graph editor for node: {node}')
-        pins_before = set(p.get_pin_name() for p in node.list_all_pins())
+        pins_before = set(p.get_pin_name() for p in BlueprintTools._list_all_pins_compat(node))  # [5.7 port] list_all_pins() is 5.8-only
         if not bp_editor.add_node_pin(node):  # type: ignore
             raise RuntimeError(
                 f'Node "{node.get_node_title()}" does not support adding pins.')
-        new_pins = [p for p in node.list_all_pins() if p.get_pin_name() not in pins_before]
+        new_pins = [p for p in BlueprintTools._list_all_pins_compat(node) if p.get_pin_name() not in pins_before]  # [5.7 port]
         if not new_pins:
             raise RuntimeError(f'add_node_pin succeeded but no new pin found on node "{node.get_node_title()}"')
         return BlueprintTools._pin_to_id(new_pins[0])
@@ -1021,7 +1216,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
             node: Node to be moved
             pos: New x, y position of the node in the graph
         """
-        node.set_node_pos(pos)
+        _set_node_pos(node, pos.x, pos.y)
         if node.get_node_pos() != pos:
             raise RuntimeError(f'Failed to set position of node {node} to {pos}.')
 
@@ -1049,7 +1244,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
             get_connected_pins=lambda pin: pin.list_connected_pins(),
             get_pin_owner=lambda pin: pin.get_owning_node(),
             get_node_pos=lambda n: (n.get_node_pos().x, n.get_node_pos().y),
-            set_node_pos=lambda n, x, y: n.set_node_pos(unreal.IntPoint(x, y)),
+            set_node_pos=lambda n, x, y: _set_node_pos(n, x, y),
             get_node_size=lambda n: (int(n.get_node_size().x), int(n.get_node_size().y)),
         ).arrange(all_nodes, to_arrange)
 
@@ -1267,7 +1462,8 @@ class BlueprintTools(unreal.ToolsetDefinition):
         if graph is not None:
             bp_editor = unreal.BlueprintGraphEditor.get_graph_editor(graph)
             return list(bp_editor.list_local_variable_names())
-        return list(unreal.BlueprintEditorLibrary.list_member_variable_names(blueprint, False))
+        # [5.7 port] list_member_variable_names is 5.8-only; use compat helper.
+        return _list_member_variable_names_compat(blueprint)
 
     @toolset_registry.tool_call
     @staticmethod
@@ -1285,47 +1481,50 @@ class BlueprintTools(unreal.ToolsetDefinition):
         unreal.BlueprintEditorLibrary.set_blueprint_variable_instance_editable(
             blueprint, unreal.Name(variable_name), instance_editable)
 
-    @toolset_registry.tool_call
-    @staticmethod
-    def get_variable_replication(
-            blueprint: unreal.Blueprint,
-            variable_name: str) -> unreal.BlueprintVariableReplication:
-        """Gets the replication mode of a Blueprint member variable.
+    # [5.7 port] unreal.BlueprintVariableReplication is 5.8-only
+    # (and BlueprintEditorLibrary.get/set_blueprint_variable_replication do not exist in 5.7).
+    # @toolset_registry.tool_call
+    # @staticmethod
+    # def get_variable_replication(
+    #         blueprint: unreal.Blueprint,
+    #         variable_name: str) -> unreal.BlueprintVariableReplication:
+    #     """Gets the replication mode of a Blueprint member variable.
+    #
+    #     Args:
+    #         blueprint: The Blueprint containing the variable.
+    #         variable_name: The name of the member variable to query.
+    #
+    #     Returns:
+    #         The replication mode (NONE, REPLICATED, or REP_NOTIFY).
+    #     """
+    #     if variable_name not in BlueprintTools.list_variables(blueprint):
+    #         raise RuntimeError(f'Variable "{variable_name}" not found in {blueprint}.')
+    #     return unreal.BlueprintEditorLibrary.get_blueprint_variable_replication(
+    #         blueprint, unreal.Name(variable_name))
 
-        Args:
-            blueprint: The Blueprint containing the variable.
-            variable_name: The name of the member variable to query.
-
-        Returns:
-            The replication mode (NONE, REPLICATED, or REP_NOTIFY).
-        """
-        if variable_name not in BlueprintTools.list_variables(blueprint):
-            raise RuntimeError(f'Variable "{variable_name}" not found in {blueprint}.')
-        return unreal.BlueprintEditorLibrary.get_blueprint_variable_replication(
-            blueprint, unreal.Name(variable_name))
-
-    @toolset_registry.tool_call
-    @staticmethod
-    def set_variable_replication(
-            blueprint: unreal.Blueprint,
-            variable_name: str,
-            replication: unreal.BlueprintVariableReplication) -> None:
-        """Sets the replication mode on a Blueprint member variable.
-
-        RepNotify will automatically create an OnRep_ function on the Blueprint if one does not
-        already exist.
-
-        Args:
-            blueprint: The Blueprint containing the variable.
-            variable_name: The name of the member variable to modify.
-            replication: Replication mode (NONE, REPLICATED, or REP_NOTIFY).
-        """
-        if variable_name not in BlueprintTools.list_variables(blueprint):
-            raise RuntimeError(f'Variable "{variable_name}" not found in {blueprint}.')
-        unreal.BlueprintEditorLibrary.set_blueprint_variable_replication(
-            blueprint, unreal.Name(variable_name), replication)
-        if replication == unreal.BlueprintVariableReplication.REP_NOTIFY:
-            _BlueprintCache.invalidate(blueprint)
+    # [5.7 port] unreal.BlueprintVariableReplication is 5.8-only
+    # @toolset_registry.tool_call
+    # @staticmethod
+    # def set_variable_replication(
+    #         blueprint: unreal.Blueprint,
+    #         variable_name: str,
+    #         replication: unreal.BlueprintVariableReplication) -> None:
+    #     """Sets the replication mode on a Blueprint member variable.
+    #
+    #     RepNotify will automatically create an OnRep_ function on the Blueprint if one does not
+    #     already exist.
+    #
+    #     Args:
+    #         blueprint: The Blueprint containing the variable.
+    #         variable_name: The name of the member variable to modify.
+    #         replication: Replication mode (NONE, REPLICATED, or REP_NOTIFY).
+    #     """
+    #     if variable_name not in BlueprintTools.list_variables(blueprint):
+    #         raise RuntimeError(f'Variable "{variable_name}" not found in {blueprint}.')
+    #     unreal.BlueprintEditorLibrary.set_blueprint_variable_replication(
+    #         blueprint, unreal.Name(variable_name), replication)
+    #     if replication == unreal.BlueprintVariableReplication.REP_NOTIFY:
+    #         _BlueprintCache.invalidate(blueprint)
 
     @toolset_registry.tool_call
     @staticmethod
@@ -1429,7 +1628,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
         Returns:
             A list of event dispatcher graphs, one per dispatcher.
         """
-        names = unreal.BlueprintEditorLibrary.list_event_dispatchers(blueprint)
+        names = _list_event_dispatcher_names(blueprint)  # [5.7 port] list_event_dispatchers is 5.8-only
         return [
             unreal.BlueprintGraphEditor.get_graph_editor_by_name(blueprint, n).get_graph()
             for n in names
@@ -1502,6 +1701,16 @@ class BlueprintTools(unreal.ToolsetDefinition):
             return decompiler.decompile()
 
     @staticmethod
+    def _ensure_create_delegate_node(node: unreal.EdGraphNode) -> None:
+        """Raises RuntimeError if node is not a K2Node_CreateDelegate (Create Event) node.
+
+        [5.7 port] unreal.K2Node_CreateDelegate is not exposed to Python on 5.7, so we
+        cannot isinstance-check it; the compat shim performs the real Cast in C++.
+        """
+        if not unreal.EditorToolsetCompatLibrary.is_create_delegate_node(node):
+            raise RuntimeError('Node is not a Create Event (K2Node_CreateDelegate) node.')
+
+    @staticmethod
     def _ensure_delegate_connected(node: unreal.EdGraphNode) -> None:
         """Raises RuntimeError if the node's OutputDelegate pin is not connected."""
         output_pins = BlueprintTools._list_pins(node, unreal.EdGraphPinDirection.EGPD_OUTPUT)
@@ -1516,7 +1725,7 @@ class BlueprintTools(unreal.ToolsetDefinition):
         blueprint = unreal.Blueprint.cast(graph.get_outer())
         if not blueprint:
             return False
-        dispatcher_names = [str(n) for n in unreal.BlueprintEditorLibrary.list_event_dispatchers(blueprint)]
+        dispatcher_names = _list_event_dispatcher_names(blueprint)  # [5.7 port] list_event_dispatchers is 5.8-only
         return graph.get_name() in dispatcher_names
 
     @staticmethod

@@ -1,5 +1,7 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 
+from __future__ import annotations
+
 import unreal
 
 from toolset_registry.agent_skill import agent_skill

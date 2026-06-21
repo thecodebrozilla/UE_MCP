@@ -72,3 +72,18 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# === [5.7 port cleanup] This repo's root IS the Plugins/ folder, so the
+# anchored rules above (Binaries/*, Plugins/**/...) do NOT match artifacts that
+# live under a plugin subdir (e.g. SomeToolset/Intermediate/...). The **/ rules
+# below match build artifacts at any depth, which is what this layout needs. ===
+**/Binaries/
+**/Intermediate/
+**/Saved/
+**/DerivedDataCache/
+**/.vs/
+
+# Python bytecode (generated next to each toolset's Python sources)
+**/__pycache__/
+*.pyc
+*.pyo

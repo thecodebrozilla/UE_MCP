@@ -30,7 +30,6 @@
 #include "MovieScene.h"
 #include "MovieSceneBinding.h"
 #include "Tracks/MovieScenePropertyTrack.h"
-#include "WidgetBlueprintOperationUtils.h"
 #include "WidgetBlueprintExtension.h"
 #include "UMGEditorProjectSettings.h"
 #include "UObject/UObjectIterator.h"
@@ -38,6 +37,16 @@
 #include "WidgetBlueprint.h"
 #include "WidgetBlueprintEditorUtils.h"
 #include "UIComponentWidgetBlueprintExtension.h"
+
+// [5.7 port] FWidgetBlueprintOperationUtils is a 5.8-only engine class with ~20 call sites below.
+// On 5.8 we include the native engine header and alias the call sites to it; on 5.7 we alias to
+// our compat reimplementation (see Compat/WidgetBlueprintOperationUtilsCompat.{h,cpp}).
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+	#include "Compat/WidgetBlueprintOperationUtilsCompat.h"
+	using FWidgetBlueprintOperationUtils = UMGToolSetCompat::FWidgetBlueprintOperationUtilsCompat;
+#else
+	#include "WidgetBlueprintOperationUtils.h"
+#endif
 
 DEFINE_LOG_CATEGORY_STATIC(LogUMGToolSet, Log, All);
 
@@ -342,7 +351,11 @@ static void CollectReferencedMembers(UWidgetBlueprint* BP, UClass* OldClass, FNa
 					Graph->GetAllChildrenGraphs(AllGraphs);
 				}
 			}
+#if UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] ForEachObjectWithOuter takes a bool bIncludeNestedObjects in 5.7; EGetObjectsFlags overload is 5.8.
+		}, true);
+#else
 		}, EGetObjectsFlags::IncludeNestedObjects);
+#endif
 
 	// Phase 1: BFS forward from the variable's Get nodes, following the widget value through
 	// reroutes / casts / array gets / selects.

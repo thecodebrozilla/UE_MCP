@@ -1,10 +1,28 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 
+from __future__ import annotations
+
 import unreal
 
 import toolset_registry
-from toolset_registry.helpers import create_asset
+from toolset_registry.helpers import asset_exists
 from editor_toolset.toolsets.asset import import_asset
+
+# [5.7 port] unreal.CurveTable *is* exposed on 5.7 (it is referenced by the
+# reflected DataTableFunctionLibrary.evaluate_curve_table_row), so it is kept in
+# the tool signatures. What is missing on 5.7 is:
+#   * unreal.SimpleCurveKey - FSimpleCurveKey is USTRUCT() without BlueprintType and
+#     is not referenced by any reflected signature, so it is not exposed. Key data
+#     is therefore passed/returned as plain dicts {'time': float, 'value': float}.
+#   * the 5.8 DataTableFunctionLibrary curve-editing helpers
+#     (add_simple_curve_to_table, set_curve_table_row_default, remove_curve_table_row,
+#      rename_curve_table_row, add_curve_table_key, get_curve_table_keys,
+#      get_curve_table_row_names) - none exist on 5.7.
+# All of the above are provided by the bundled BlueprintGraphEditorPort plugin's
+# unreal.EditorToolsetCompatLibrary, which operates directly on the UCurveTable.
+#
+# Note: the shim is referenced inside method bodies (not at module scope) so this
+# module still imports even if BlueprintGraphEditorPort is absent.
 
 
 @unreal.uclass()
@@ -56,8 +74,12 @@ class CurveTableTools(unreal.ToolsetDefinition):
         Returns:
             The created CurveTable.
         """
-        asset = create_asset(
-            folder_path, asset_name, unreal.CurveTable.static_class(), unreal.CurveTableFactory())
+        # [5.7 port] unreal.CurveTableFactory is not exposed on 5.7; create the
+        # asset natively (linear simple-curve mode) via the compat shim.
+        if asset_exists(f'{folder_path}/{asset_name}'):
+            raise RuntimeError(
+                f'create_asset: {asset_name} at {folder_path} already exists')
+        asset = unreal.EditorToolsetCompatLibrary.create_curve_table_asset(folder_path, asset_name)
         if not isinstance(asset, unreal.CurveTable):
             raise ValueError(f'Unable to create CurveTable in {folder_path}/{asset_name}')
         return asset
@@ -73,7 +95,7 @@ class CurveTableTools(unreal.ToolsetDefinition):
         Returns:
             A list of row names.
         """
-        return unreal.DataTableFunctionLibrary.get_curve_table_row_names(curve_table)
+        return list(unreal.EditorToolsetCompatLibrary.curve_table_list_rows(curve_table))
 
     @toolset_registry.tool_call
     @staticmethod
@@ -86,10 +108,10 @@ class CurveTableTools(unreal.ToolsetDefinition):
             default_value: The default value returned when sampling outside the key range.
         """
         CurveTableTools._ensure_row_doesnt_exist(curve_table, row_name)
-        unreal.DataTableFunctionLibrary.add_simple_curve_to_table(curve_table, row_name)
+        if not unreal.EditorToolsetCompatLibrary.curve_table_add_row(curve_table, row_name):
+            raise RuntimeError(f'Failed to add row "{row_name}" to the curve table.')
         if default_value is not None:
-            unreal.DataTableFunctionLibrary.set_curve_table_row_default(
-                curve_table, row_name, default_value)
+            unreal.EditorToolsetCompatLibrary.curve_table_set_row_default(curve_table, row_name, default_value)
         CurveTableTools._ensure_row_exists(curve_table, row_name)
 
     @toolset_registry.tool_call
@@ -102,7 +124,7 @@ class CurveTableTools(unreal.ToolsetDefinition):
             row_name: The name of the row to remove.
         """
         CurveTableTools._ensure_row_exists(curve_table, row_name)
-        unreal.DataTableFunctionLibrary.remove_curve_table_row(curve_table, row_name)
+        unreal.EditorToolsetCompatLibrary.curve_table_remove_row(curve_table, row_name)
         CurveTableTools._ensure_row_doesnt_exist(curve_table, row_name)
 
     @toolset_registry.tool_call
@@ -117,49 +139,50 @@ class CurveTableTools(unreal.ToolsetDefinition):
         """
         CurveTableTools._ensure_row_exists(curve_table, row_name)
         CurveTableTools._ensure_row_doesnt_exist(curve_table, new_row_name)
-        unreal.DataTableFunctionLibrary.rename_curve_table_row(
-            curve_table, row_name, new_row_name)
+        unreal.EditorToolsetCompatLibrary.curve_table_rename_row(curve_table, row_name, new_row_name)
         CurveTableTools._ensure_row_doesnt_exist(curve_table, row_name)
         CurveTableTools._ensure_row_exists(curve_table, new_row_name)
 
     @toolset_registry.tool_call
     @staticmethod
-    def add_key(curve_table: unreal.CurveTable, row_name: str, key: unreal.SimpleCurveKey) -> bool:
+    def add_key(curve_table: unreal.CurveTable, row_name: str, time: float, value: float) -> bool:
         """Adds a key to a row.
 
         Args:
             curve_table: The CurveTable to modify.
             row_name: The name of the row to modify.
-            key: The key to add, containing the time and value.
+            time: The time (X) of the key to add.
+            value: The value (Y) of the key to add.
 
         Returns:
             True if the key was added successfully.
         """
         CurveTableTools._ensure_row_exists(curve_table, row_name)
-        return CurveTableTools._add_key(curve_table, row_name, key)
+        return unreal.EditorToolsetCompatLibrary.curve_table_add_key(curve_table, row_name, time, value)
 
     @toolset_registry.tool_call
     @staticmethod
     def set_keys(curve_table: unreal.CurveTable, row_name: str,
-                 keys: list[unreal.SimpleCurveKey]) -> bool:
+                 keys: list[dict[str, float]]) -> bool:
         """Replaces all keys in a row with the provided list.
 
         Args:
             curve_table: The CurveTable to modify.
             row_name: The name of the row to modify.
-            keys: The keys to set in the row.
+            keys: The keys to set in the row. Each key is a dict with 'time' and
+                'value' float entries, e.g. {'time': 0.0, 'value': 1.0}.
 
         Returns:
             True if all keys were set successfully.
         """
         CurveTableTools._ensure_row_exists(curve_table, row_name)
-        unreal.DataTableFunctionLibrary.remove_curve_table_row(curve_table, row_name)
-        unreal.DataTableFunctionLibrary.add_simple_curve_to_table(curve_table, row_name)
-        return all(CurveTableTools._add_key(curve_table, row_name, key) for key in keys)
+        times = [float(k['time']) for k in keys]
+        values = [float(k['value']) for k in keys]
+        return unreal.EditorToolsetCompatLibrary.curve_table_set_keys(curve_table, row_name, times, values)
 
     @toolset_registry.tool_call
     @staticmethod
-    def get_keys(curve_table: unreal.CurveTable, row_name: str) -> list[unreal.SimpleCurveKey]:
+    def get_keys(curve_table: unreal.CurveTable, row_name: str) -> list[dict[str, float]]:
         """Returns all keys for a row.
 
         Args:
@@ -167,16 +190,12 @@ class CurveTableTools(unreal.ToolsetDefinition):
             row_name: The name of the row to query.
 
         Returns:
-            A list of SimpleCurveKey objects for the row.
+            A list of {'time': float, 'value': float} dicts, one per key.
         """
         CurveTableTools._ensure_row_exists(curve_table, row_name)
-        return list(unreal.DataTableFunctionLibrary.get_curve_table_keys(curve_table, row_name))
-
-    @staticmethod
-    def _add_key(curve_table: unreal.CurveTable, row_name: str, key: unreal.SimpleCurveKey) -> bool:
-        return unreal.DataTableFunctionLibrary.add_curve_table_key(
-            curve_table, row_name,
-            key.get_editor_property('time'), key.get_editor_property('value'))
+        times = list(unreal.EditorToolsetCompatLibrary.curve_table_get_key_times(curve_table, row_name))
+        values = list(unreal.EditorToolsetCompatLibrary.curve_table_get_key_values(curve_table, row_name))
+        return [{'time': t, 'value': v} for t, v in zip(times, values)]
 
     @staticmethod
     def _ensure_row_exists(curve_table: unreal.CurveTable, row_name: str) -> None:

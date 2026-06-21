@@ -8,6 +8,7 @@
 /NODEFAULTLIB
 "B:/Unreal Projects/UE_MCP/Intermediate/Build/Win64/x64/UE_MCPEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
 "B:/Unreal Projects/UE_MCP/Plugins/ToolsetRegistry/Intermediate/Build/Win64/x64/UnrealEditor/Development/ToolsetRegistry/Module.ToolsetRegistry.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ToolsetRegistry/Intermediate/Build/Win64/x64/UnrealEditor/Development/ToolsetRegistry/KismetSystemLibraryCompat.cpp.obj"
 "B:/Unreal Projects/UE_MCP/Plugins/ToolsetRegistry/Intermediate/Build/Win64/x64/UnrealEditor/Development/ToolsetRegistry/AgentSkill.cpp.obj"
 "B:/Unreal Projects/UE_MCP/Plugins/ToolsetRegistry/Intermediate/Build/Win64/x64/UnrealEditor/Development/ToolsetRegistry/ColorConverter.cpp.obj"
 "B:/Unreal Projects/UE_MCP/Plugins/ToolsetRegistry/Intermediate/Build/Win64/x64/UnrealEditor/Development/ToolsetRegistry/FunctionLibraryToolset.cpp.obj"

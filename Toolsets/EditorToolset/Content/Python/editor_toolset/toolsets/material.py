@@ -1,5 +1,7 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 
+from __future__ import annotations
+
 import unreal
 
 import toolset_registry
@@ -534,10 +536,39 @@ class MaterialTools(unreal.ToolsetDefinition):
     @staticmethod
     def _get_expressions(
             material_or_function: unreal.Object) -> list[unreal.MaterialExpression]:
-        return list(MaterialTools._dispatch(
-            material_or_function,
-            unreal.MaterialEditingLibrary.get_material_expressions,
-            unreal.MaterialEditingLibrary.get_material_function_expressions))
+        # [5.7 port] MaterialEditingLibrary.get_material_expressions / get_material_function_expressions
+        # are 5.8-only. Fall back to reading the 'expressions' / 'function_expressions'
+        # UPROPERTY directly on the asset object. If those also fail (protected / not mapped),
+        # degrade to an empty list rather than crashing.
+        def _on_material(m):
+            try:
+                return list(unreal.MaterialEditingLibrary.get_material_expressions(m))
+            except AttributeError:
+                pass  # 5.7: API not available
+            for prop in ('expressions', 'Expressions'):
+                try:
+                    exprs = m.get_editor_property(prop)
+                    if exprs is not None:
+                        return list(exprs)
+                except Exception:
+                    pass
+            return []
+
+        def _on_function(f):
+            try:
+                return list(unreal.MaterialEditingLibrary.get_material_function_expressions(f))
+            except AttributeError:
+                pass  # 5.7: API not available
+            for prop in ('function_expressions', 'FunctionExpressions'):
+                try:
+                    exprs = f.get_editor_property(prop)
+                    if exprs is not None:
+                        return list(exprs)
+                except Exception:
+                    pass
+            return []
+
+        return list(MaterialTools._dispatch(material_or_function, _on_material, _on_function))
 
     @staticmethod
     def _rename_group(

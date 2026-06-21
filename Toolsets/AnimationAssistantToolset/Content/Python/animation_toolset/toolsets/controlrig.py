@@ -105,21 +105,25 @@ class ControlRigTools(unreal.ToolsetDefinition):
     @staticmethod
     def get_elements(
         control_rig: unreal.ControlRigBlueprint,
-        element_type: unreal.RigElementType | None = None
+        element_type: unreal.RigElementType = unreal.RigElementType.NONE
     ) -> list[unreal.RigElementKey]:
         """Get hierarchy elements of the specified type.
 
         Args:
             control_rig: The Control Rig to query.
-            element_type: Type of elements to return, or None for all elements.
+            element_type: Type of elements to return; RigElementType.NONE (the
+                default) returns all elements.
 
         Returns:
             List of RigElementKeys matching the specified type.
         """
+        # [5.7 port] Was `unreal.RigElementType | None = None`; UE 5.7's Python
+        # reflection cannot build an optional-enum property, so we use NONE
+        # (the enum's zero value) as the "all elements" sentinel instead of None.
         hierarchy = ControlRigTools._get_hierarchy(control_rig)
         all_keys = hierarchy.get_all_keys()
 
-        if element_type is None:
+        if element_type == unreal.RigElementType.NONE:
             return list(all_keys)
 
         return [key for key in all_keys if key.type == element_type]

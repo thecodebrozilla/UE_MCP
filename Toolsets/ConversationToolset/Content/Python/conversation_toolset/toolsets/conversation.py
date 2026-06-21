@@ -9,29 +9,33 @@ import toolset_registry
 class ConversationTools(unreal.ToolsetDefinition):
     """Inspect Conversation Graph (UConversationDatabase) dialogue assets."""
 
-    @toolset_registry.tool_call
-    @staticmethod
-    def list_entry_points(conversation: unreal.ConversationDatabase) -> list[unreal.ConversationEntryList]:
-        """Returns entry points (FConversationEntryList structs).
+    # [5.7 port] unreal.ConversationEntryList is 5.8-only: FConversationEntryList is
+    # USTRUCT() (not BlueprintType) in UE 5.7, so it is not Python-exposed. Disabled.
+    # @toolset_registry.tool_call
+    # @staticmethod
+    # def list_entry_points(conversation: unreal.ConversationDatabase) -> list[unreal.ConversationEntryList]:
+    #     """Returns entry points (FConversationEntryList structs).
+    #
+    #     Args:
+    #         conversation: The ConversationDatabase asset.
+    #     Returns:
+    #         A list of FConversationEntryList structs.
+    #     """
+    #     return list(conversation.entry_tags)
 
-        Args:
-            conversation: The ConversationDatabase asset.
-        Returns:
-            A list of FConversationEntryList structs.
-        """
-        return list(conversation.entry_tags)
-
-    @toolset_registry.tool_call
-    @staticmethod
-    def list_speakers(conversation: unreal.ConversationDatabase) -> list[unreal.CommonDialogueBankParticipant]:
-        """Returns speaker/participant information.
-
-        Args:
-            conversation: The ConversationDatabase asset.
-        Returns:
-            A list of FCommonDialogueBankParticipant structs.
-        """
-        return list(conversation.speakers)
+    # [5.7 port] unreal.CommonDialogueBankParticipant is 5.8-only: FCommonDialogueBankParticipant
+    # is USTRUCT() (not BlueprintType) in UE 5.7, so it is not Python-exposed. Disabled.
+    # @toolset_registry.tool_call
+    # @staticmethod
+    # def list_speakers(conversation: unreal.ConversationDatabase) -> list[unreal.CommonDialogueBankParticipant]:
+    #     """Returns speaker/participant information.
+    #
+    #     Args:
+    #         conversation: The ConversationDatabase asset.
+    #     Returns:
+    #         A list of FCommonDialogueBankParticipant structs.
+    #     """
+    #     return list(conversation.speakers)
 
     @toolset_registry.tool_call
     @staticmethod

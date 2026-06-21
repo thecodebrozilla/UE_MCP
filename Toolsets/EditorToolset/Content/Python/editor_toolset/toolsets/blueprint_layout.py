@@ -1,5 +1,7 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 
+from __future__ import annotations
+
 import collections
 from dataclasses import dataclass, field
 from typing import Callable

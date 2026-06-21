@@ -836,21 +836,29 @@ bool FModelContextProtocolServer::ProcessToolCallJsonRpcCall(const FHttpServerRe
 	FModelContextProtocolToolContext& Context = Session->ActiveRequests.Add(ToolRequestId);
 	Context.Tool = Tool;
 	Context.ProgressToken = ProgressToken;
-	// Saving the callback for re-use with SSE event streaming
+#if !UE_VERSION_OLDER_THAN(5, 8, 0)
+	// Saving the callback for re-use with SSE event streaming (5.8+ multi-write streaming only).
+	// On 5.7 we deliberately leave EventStreamWrite unset so the progress/list_changed senders
+	// (which would be additional writes) skip via their IsSet() checks.
 	Context.EventStreamWrite = OnComplete;
+#endif
 	Context.LastProgressSeconds = FPlatformTime::Seconds();
 
 	const FString SessionId = Session->ID;
 
+#if !UE_VERSION_OLDER_THAN(5, 8, 0)
+	// 5.8+ opens an SSE stream up-front and writes the result as a later event over the same
+	// connection. 5.7's HTTPServer allows only ONE response per connection (a second OnComplete
+	// asserts AwaitingProcessing == GetState()), so on 5.7 we skip the stream open entirely and
+	// send a single application/json result from HandleToolResult; the connection stays in
+	// AwaitingProcessing (deferred response) until the tool completes.
 	TUniquePtr<FHttpServerResponse> Response = FHttpServerResponse::Create(FString(TEXT("")), UE::ModelContextProtocol::ContentTypeEventStream);
 	Response->Headers.Add(TEXT("Connection"), { TEXT("keep-alive") });
 	Response->Headers.Add(TEXT("Cache-Control"), { TEXT("no-cache") });
 	Response->Headers.Add(UE::ModelContextProtocol::Private::McpSessionIdHeader, { SessionId });
-	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] HTTPServer streaming-response flags are 5.8+
 	EnumAddFlags(Response->Flags, EHttpServerResponseFlags::MultipleWriteStream | EHttpServerResponseFlags::HasAdditionalWrites);
-	#endif
-
 	OnComplete(MoveTemp(Response));
+#endif
 
 	TWeakPtr<bool> WeakAlive = AliveGuard;
 	const double ToolCallStartTime = FPlatformTime::Seconds();
@@ -896,10 +904,15 @@ bool FModelContextProtocolServer::ProcessToolCallJsonRpcCall(const FHttpServerRe
 		TSharedRef<TJsonWriter<UTF8CHAR, TCondensedJsonPrintPolicy<UTF8CHAR>>> JsonWriter = TJsonWriterFactory<UTF8CHAR, TCondensedJsonPrintPolicy<UTF8CHAR>>::Create(&ResponseStr);
 		FJsonSerializer::Serialize(ResponseObject.AsJsonObject(), JsonWriter);
 
+#if !UE_VERSION_OLDER_THAN(5, 8, 0)
 		TUniquePtr<FHttpServerResponse> ServerResponse = FHttpServerResponse::Create(UE::ModelContextProtocol::Private::FormatSSEMessage(ResponseStr), UE::ModelContextProtocol::ContentTypeEventStream);
-		#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] HTTPServer streaming-response flags are 5.8+
 		EnumAddFlags(ServerResponse->Flags, EHttpServerResponseFlags::MultipleWriteStream | EHttpServerResponseFlags::SkipHeaderWrite);
-		#endif
+#else
+		// [5.7 port] No SSE multi-write on 5.7's HTTPServer; reply with a single application/json
+		// response (MCP Streamable-HTTP non-streaming mode). This is the one and only OnComplete call.
+		TUniquePtr<FHttpServerResponse> ServerResponse = FHttpServerResponse::Create(ResponseStr, TEXT("application/json"));
+		ServerResponse->Headers.Add(UE::ModelContextProtocol::Private::McpSessionIdHeader, { SessionId });
+#endif
 
 		OnComplete(MoveTemp(ServerResponse));
 	};

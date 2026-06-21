@@ -1,6 +1,8 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 """Core Blueprint graph data types shared across blueprint modules."""
 
+from __future__ import annotations
+
 import unreal
 
 
@@ -10,6 +12,9 @@ class PinID(unreal.StructBase):
     node = unreal.uproperty(unreal.EdGraphNode)
     index_id = unreal.uproperty(int)
     direction = unreal.uproperty(unreal.EdGraphPinDirection)
+    # [5.7 port] Cache the FName pin name so _resolve_pin can reconstruct an
+    # FBlueprintGraphPin without calling list_all_pins() (5.8-only).
+    pin_name = unreal.uproperty(str)
 
 
 @unreal.ustruct()

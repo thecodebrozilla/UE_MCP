@@ -1,6 +1,8 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 """Toolset that supports programmatic execution of tools."""
 
+from __future__ import annotations
+
 import ast
 import atexit
 from asyncio import AbstractEventLoop

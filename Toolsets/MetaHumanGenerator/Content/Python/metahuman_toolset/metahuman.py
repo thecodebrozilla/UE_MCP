@@ -113,17 +113,22 @@ class BodyShape(unreal.StructBase):
     - stocky middle-aged man: masculine_feminine=0.20, fat=0.70, muscularity=0.50, height_cm=175
     """
 
+    # [5.7 port] uproperty type was the optional tuple (float, None); UE 5.7's
+    # reflection cannot build an optional-scalar struct property ("Failed to
+    # create property ... (tuple)"). Use a plain float and treat any negative
+    # value as "unset / do not change" (all valid ranges are >= 0). Defaults to
+    # -1.0 below so a freshly constructed BodyShape leaves every field unchanged.
     masculine_feminine = unreal.uproperty(
-        (float, None), meta={'ClampMin': 0.0, 'ClampMax': 1.0, 'ToolTip': 'Masculine/feminine (0..1). 0=masculine, 1=feminine'}
+        float, meta={'ClampMin': -1.0, 'ClampMax': 1.0, 'ToolTip': 'Masculine/feminine (0..1). 0=masculine, 1=feminine. Negative = leave unchanged'}
     )
     fat = unreal.uproperty(
-        (float, None), meta={'ClampMin': 0.0, 'ClampMax': 1.0, 'ToolTip': 'Body fat (0..1). 0=lean, 1=overweight'}
+        float, meta={'ClampMin': -1.0, 'ClampMax': 1.0, 'ToolTip': 'Body fat (0..1). 0=lean, 1=overweight. Negative = leave unchanged'}
     )
     muscularity = unreal.uproperty(
-        (float, None), meta={'ClampMin': 0.0, 'ClampMax': 1.0, 'ToolTip': 'Muscle definition (0..1). 0=no muscle, 1=extreme muscle'}
+        float, meta={'ClampMin': -1.0, 'ClampMax': 1.0, 'ToolTip': 'Muscle definition (0..1). 0=no muscle, 1=extreme muscle. Negative = leave unchanged'}
     )
     height_cm = unreal.uproperty(
-        (float, None), meta={'ClampMin': 135.0, 'ClampMax': 220.0, 'ToolTip': 'Height in centimeters'}
+        float, meta={'ClampMin': -1.0, 'ClampMax': 220.0, 'ToolTip': 'Height in centimeters (135..220). Negative = leave unchanged'}
     )
 
 
@@ -179,11 +184,13 @@ class MetaHumanToolset(unreal.ToolsetDefinition):
                 scaled_value = unreal.MathLibrary.f_clamp(normalized, 0.0, 1.0)
             params_scaled[name] = scaled_value
 
+        # [5.7 port] Fields are plain floats now (no optional); use -1.0 to mean
+        # "not constrained / unchanged" for params that have no active constraint.
         body_shape = BodyShape()
-        body_shape.masculine_feminine = params_scaled.get(_BODY_PARAM_MASCULINE_FEMININE)
-        body_shape.fat = params_scaled.get(_BODY_PARAM_FAT)
-        body_shape.muscularity = params_scaled.get(_BODY_PARAM_MUSCULARITY)
-        body_shape.height_cm = params_scaled.get(_BODY_PARAM_HEIGHT)
+        body_shape.masculine_feminine = params_scaled.get(_BODY_PARAM_MASCULINE_FEMININE, -1.0)
+        body_shape.fat = params_scaled.get(_BODY_PARAM_FAT, -1.0)
+        body_shape.muscularity = params_scaled.get(_BODY_PARAM_MUSCULARITY, -1.0)
+        body_shape.height_cm = params_scaled.get(_BODY_PARAM_HEIGHT, -1.0)
         return body_shape
 
     @toolset_registry.tool_call
@@ -194,7 +201,9 @@ class MetaHumanToolset(unreal.ToolsetDefinition):
             session: Session from begin_edit()
             body_shape: Body shape parameters to apply
         """
-        if all(v is None for v in [body_shape.masculine_feminine, body_shape.fat, body_shape.muscularity, body_shape.height_cm]):
+        # [5.7 port] Fields are plain floats now; a negative value means "leave
+        # this parameter unchanged" (was None in the original optional form).
+        if all(v < 0.0 for v in [body_shape.masculine_feminine, body_shape.fat, body_shape.muscularity, body_shape.height_cm]):
             unreal.log_warning(f"[MetaHumanGenerator] set_body_shape called with no parameters for {session.object_path}")
             return
 
@@ -202,13 +211,13 @@ class MetaHumanToolset(unreal.ToolsetDefinition):
         constraints_dict = {str(c.name): c for c in body_constraints}
 
         updates = []
-        if body_shape.masculine_feminine is not None:
+        if body_shape.masculine_feminine >= 0.0:
             updates.append((_BODY_PARAM_MASCULINE_FEMININE, body_shape.masculine_feminine))
-        if body_shape.fat is not None:
+        if body_shape.fat >= 0.0:
             updates.append((_BODY_PARAM_FAT, body_shape.fat))
-        if body_shape.muscularity is not None:
+        if body_shape.muscularity >= 0.0:
             updates.append((_BODY_PARAM_MUSCULARITY, body_shape.muscularity))
-        if body_shape.height_cm is not None:
+        if body_shape.height_cm >= 0.0:
             updates.append((_BODY_PARAM_HEIGHT, body_shape.height_cm))
 
         for name, value in updates:

@@ -10,8 +10,12 @@ class BehaviorTreeTools(unreal.ToolsetDefinition):
     """Inspect BehaviorTree (BT) assets."""
 
     @staticmethod
-    def _collect_all_nodes(composite: unreal.BTCompositeNode, depth: int, nodes: list, depths: list) -> None:
+    def _collect_all_nodes(composite: unreal.BTNode, depth: int, nodes: list, depths: list) -> None:
         """Recursively collects all node UObjects and their depths."""
+        # [5.7 port] unreal.BTCompositeNode is not Python-exposed in UE 5.7
+        # (UBTCompositeNode is UCLASS(Abstract, MinimalAPI), not reflected as
+        # an attribute on the `unreal` module in 5.7). Annotation remapped to
+        # unreal.BTNode (its exposed base, used elsewhere in this file).
         nodes.append(composite)
         depths.append(depth)
         for service in composite.services:
@@ -24,14 +28,17 @@ class BehaviorTreeTools(unreal.ToolsetDefinition):
             node = child.child_composite or child.child_task
             if node is None:
                 continue
-            if isinstance(node, unreal.BTCompositeNode):
+            # [5.7 port] unreal.BTCompositeNode is not Python-exposed in 5.7; a
+            # composite node is identified by duck-typing on its `children` member
+            # (only UBTCompositeNode exposes a `children` array) instead of isinstance.
+            if hasattr(node, 'children'):
                 BehaviorTreeTools._collect_all_nodes(node, depth + 1, nodes, depths)
             else:
                 nodes.append(node)
                 depths.append(depth + 1)
 
     @staticmethod
-    def _build_node_list(behavior_tree: unreal.BehaviorTree) -> tuple:
+    def _build_node_list(behavior_tree: unreal.BehaviorTree) -> list:
         """Returns (nodes, depths) for a BT."""
         nodes = []
         depths = []
@@ -116,8 +123,11 @@ class BehaviorTreeTools(unreal.ToolsetDefinition):
 
     @toolset_registry.tool_call
     @staticmethod
-    def get_children(composite: unreal.BTCompositeNode) -> list[unreal.BTNode]:
+    def get_children(composite: unreal.BTNode) -> list[unreal.BTNode]:
         """Returns direct child nodes of a composite node.
+
+        Note: [5.7 port] annotated as unreal.BTNode because unreal.BTCompositeNode
+        is not Python-exposed in UE 5.7; callers should still pass a composite node.
 
         Args:
             composite: A BTCompositeNode (Selector, Sequence, etc.).

@@ -2,6 +2,8 @@
 
 """S-expression IDL for Blueprint graphs: transpile DSL text → nodes, decompile nodes → DSL text."""
 
+from __future__ import annotations
+
 import collections
 import dataclasses
 import re

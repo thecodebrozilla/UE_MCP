@@ -1,14 +1,27 @@
 # Copyright Epic Games, Inc. All Rights Reserved.
 
-import csv
-import io
+from __future__ import annotations
+
 import os
 
 import unreal
 
 import toolset_registry
-from toolset_registry.helpers import create_asset
+from toolset_registry.helpers import asset_exists
 from editor_toolset.toolsets.asset import AssetTools
+
+# [5.7 port] unreal.StringTable (UStringTable) is not exposed to Python on UE 5.7
+# (UCLASS without BlueprintType and not referenced by any reflected signature), and
+# the 5.8 StringTableLibrary helpers get_table_id / import_table_from_csv_* do not
+# exist on 5.7. The bundled BlueprintGraphEditorPort plugin provides
+# unreal.EditorToolsetCompatLibrary, a thin C++ shim that performs each StringTable
+# operation directly on the asset (passed as a plain unreal.Object). All tool
+# signatures therefore annotate the asset as unreal.Object so the tools register and
+# function on 5.7; the shim Cast<UStringTable>s internally.
+#
+# Note: the shim is referenced inside method bodies (not at module scope) so this
+# module still imports even if BlueprintGraphEditorPort is absent; the tools then
+# fail at call time rather than aborting the whole editor_toolset package import.
 
 
 @unreal.uclass()
@@ -42,10 +55,8 @@ class StringTableTools(unreal.ToolsetDefinition):
                 f'StringTable import only supports ".csv" files, got ".{ext}".')
         asset_path = f'{folder_path}/{asset_name}'
         string_table = StringTableTools.create(folder_path, asset_name)
-        table_id = unreal.StringTableLibrary.get_table_id(string_table)
         try:
-            if not unreal.StringTableLibrary.import_table_from_csv_file(
-                    table_id, source_file):
+            if not unreal.EditorToolsetCompatLibrary.string_table_import_csv_file(string_table, source_file):
                 raise RuntimeError(
                     f'Failed to import "{source_file}" into StringTable "{asset_path}".')
         except Exception:
@@ -60,7 +71,7 @@ class StringTableTools(unreal.ToolsetDefinition):
 
     @toolset_registry.tool_call
     @staticmethod
-    def create(folder_path: str, asset_name: str) -> unreal.StringTable:
+    def create(folder_path: str, asset_name: str) -> unreal.Object:
         """Creates a new StringTable asset.
 
         Args:
@@ -70,16 +81,19 @@ class StringTableTools(unreal.ToolsetDefinition):
         Returns:
             The created StringTable.
         """
-        asset = create_asset(
-            folder_path, asset_name,
-            unreal.StringTable.static_class(), unreal.StringTableFactory())
-        if not isinstance(asset, unreal.StringTable):
+        # [5.7 port] unreal.StringTable.static_class() / unreal.StringTableFactory
+        # are not exposed on 5.7; create the asset natively via the compat shim.
+        if asset_exists(f'{folder_path}/{asset_name}'):
+            raise RuntimeError(
+                f'create_asset: {asset_name} at {folder_path} already exists')
+        asset = unreal.EditorToolsetCompatLibrary.create_string_table_asset(folder_path, asset_name)
+        if asset is None:
             raise ValueError(f'Unable to create StringTable in {folder_path}/{asset_name}')
         return asset
 
     @toolset_registry.tool_call
     @staticmethod
-    def get_table_id(string_table: unreal.StringTable) -> str:
+    def get_table_id(string_table: unreal.Object) -> str:
         """Returns the table ID for a StringTable asset.
 
         The table ID is derived from the asset's package path and is used
@@ -91,11 +105,11 @@ class StringTableTools(unreal.ToolsetDefinition):
         Returns:
             The table ID as a string.
         """
-        return str(unreal.StringTableLibrary.get_table_id(string_table))
+        return str(unreal.EditorToolsetCompatLibrary.string_table_get_id(string_table))
 
     @toolset_registry.tool_call
     @staticmethod
-    def get_namespace(string_table: unreal.StringTable) -> str:
+    def get_namespace(string_table: unreal.Object) -> str:
         """Returns the namespace of a StringTable asset.
 
         Args:
@@ -104,12 +118,11 @@ class StringTableTools(unreal.ToolsetDefinition):
         Returns:
             The namespace string.
         """
-        table_id = unreal.StringTableLibrary.get_table_id(string_table)
-        return unreal.StringTableLibrary.get_table_namespace(table_id)
+        return unreal.EditorToolsetCompatLibrary.string_table_get_namespace(string_table)
 
     @toolset_registry.tool_call
     @staticmethod
-    def list_keys(string_table: unreal.StringTable) -> list[str]:
+    def list_keys(string_table: unreal.Object) -> list[str]:
         """Lists all keys in the string table.
 
         Args:
@@ -118,12 +131,11 @@ class StringTableTools(unreal.ToolsetDefinition):
         Returns:
             A list of key strings.
         """
-        table_id = unreal.StringTableLibrary.get_table_id(string_table)
-        return list(unreal.StringTableLibrary.get_keys_from_string_table(table_id))
+        return list(unreal.EditorToolsetCompatLibrary.string_table_list_keys(string_table))
 
     @toolset_registry.tool_call
     @staticmethod
-    def get_entry(string_table: unreal.StringTable, key: str) -> str:
+    def get_entry(string_table: unreal.Object, key: str) -> str:
         """Returns the source string for a specific key.
 
         Args:
@@ -134,12 +146,11 @@ class StringTableTools(unreal.ToolsetDefinition):
             The source string for the key.
         """
         StringTableTools._ensure_key_exists(string_table, key)
-        table_id = unreal.StringTableLibrary.get_table_id(string_table)
-        return unreal.StringTableLibrary.get_table_entry_source_string(table_id, key)
+        return unreal.EditorToolsetCompatLibrary.string_table_get_entry(string_table, key)
 
     @toolset_registry.tool_call
     @staticmethod
-    def set_entry(string_table: unreal.StringTable, key: str, value: str) -> None:
+    def set_entry(string_table: unreal.Object, key: str, value: str) -> None:
         """Adds or updates an entry in the string table.
 
         If the key already exists its value is replaced; otherwise a new entry
@@ -150,13 +161,12 @@ class StringTableTools(unreal.ToolsetDefinition):
             key: The key for the entry.
             value: The source string value for the entry.
         """
-        entries = StringTableTools._get_all_entries(string_table)
-        entries[key] = value
-        StringTableTools._import_entries(string_table, entries)
+        if not unreal.EditorToolsetCompatLibrary.string_table_set_entry(string_table, key, value):
+            raise RuntimeError(f'Failed to set entry "{key}" on the string table.')
 
     @toolset_registry.tool_call
     @staticmethod
-    def remove_entry(string_table: unreal.StringTable, key: str) -> None:
+    def remove_entry(string_table: unreal.Object, key: str) -> None:
         """Removes an entry from the string table.
 
         Args:
@@ -164,34 +174,14 @@ class StringTableTools(unreal.ToolsetDefinition):
             key: The key of the entry to remove.
         """
         StringTableTools._ensure_key_exists(string_table, key)
-        entries = StringTableTools._get_all_entries(string_table)
-        del entries[key]
-        if not entries:
+        if len(StringTableTools.list_keys(string_table)) <= 1:
             raise RuntimeError(
                 f'Cannot remove the last entry "{key}" from a StringTable. '
                 'The API does not support clearing all entries programmatically.')
-        StringTableTools._import_entries(string_table, entries)
+        if not unreal.EditorToolsetCompatLibrary.string_table_remove_entry(string_table, key):
+            raise RuntimeError(f'Failed to remove entry "{key}" from the string table.')
 
     @staticmethod
-    def _ensure_key_exists(string_table: unreal.StringTable, key: str) -> None:
+    def _ensure_key_exists(string_table: unreal.Object, key: str) -> None:
         if key not in StringTableTools.list_keys(string_table):
             raise ValueError(f'Key "{key}" does not exist in the string table.')
-
-    @staticmethod
-    def _get_all_entries(string_table: unreal.StringTable) -> dict[str, str]:
-        """Returns all entries as a dict of key -> source string."""
-        table_id = unreal.StringTableLibrary.get_table_id(string_table)
-        keys = unreal.StringTableLibrary.get_keys_from_string_table(table_id)
-        return {k: unreal.StringTableLibrary.get_table_entry_source_string(table_id, k)
-                for k in keys}
-
-    @staticmethod
-    def _import_entries(string_table: unreal.StringTable, entries: dict[str, str]) -> None:
-        """Replaces all entries in the string table via CSV import."""
-        output = io.StringIO()
-        writer = csv.writer(output)
-        writer.writerow(['Key', 'SourceString'])
-        for key, value in entries.items():
-            writer.writerow([key, value])
-        table_id = unreal.StringTableLibrary.get_table_id(string_table)
-        unreal.StringTableLibrary.import_table_from_csv_string(table_id, output.getvalue())

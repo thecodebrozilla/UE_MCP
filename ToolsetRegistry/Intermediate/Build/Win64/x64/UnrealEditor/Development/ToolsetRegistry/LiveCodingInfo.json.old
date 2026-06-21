@@ -15,6 +15,7 @@
 			"TransformConverter.gen.cpp.obj",
 			"UToolsetRegistry.gen.cpp.obj",
 			"PerModuleInline.gen.cpp.obj",
+			"KismetSystemLibraryCompat.cpp.obj",
 			"AgentSkill.cpp.obj",
 			"ColorConverter.cpp.obj",
 			"FunctionLibraryToolset.cpp.obj",

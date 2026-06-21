@@ -111,9 +111,11 @@ UToolCallAsyncResultVoid* UPCGToolset::DrawSpline(const FString& ActorLabel, con
 	const FEditorModeID EM_PCGEditorModeId = TEXT("EM_PCGEditorMode");
 	ensure(IsInGameThread());
 
+	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null.
 	PCGUtils::FScopedCallOutputDevice OutputDevice;
-	#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null
 	PCGUtils::FScopedCall ScopedCall(nullptr, nullptr, OutputDevice);
+	#else // [5.7 port] FScopedCallOutputDevice ctor not exported in 5.7; this function passes OutputDevice to a console-command Execute below, so use GLog.
+	FOutputDevice& OutputDevice = *GLog;
 	#endif
 
 	UEditorActorSubsystem* EditorActorSubsystem = GEditor ? GEditor->GetEditorSubsystem<UEditorActorSubsystem>() : nullptr;
@@ -262,9 +264,11 @@ UToolCallAsyncResultVoid* UPCGToolset::DrawSpline(const FString& ActorLabel, con
 				ActorLabel=TemporaryUniqueActorLabel]
 			(UInteractiveToolManager* ToolManager, UInteractiveTool* InTool)
 			{
+				#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null.
 				PCGUtils::FScopedCallOutputDevice OutputDevice;
-				#if !UE_VERSION_OLDER_THAN(5, 8, 0) // [5.7 port] FScopedCall owner param is a reference in 5.7; this profiling scope passes null
 				PCGUtils::FScopedCall ScopedCall(nullptr, nullptr, OutputDevice);
+				#else // [5.7 port] FScopedCallOutputDevice ctor not exported in 5.7; OutputDevice is passed to a console-command Execute below, so use GLog.
+				FOutputDevice& OutputDevice = *GLog;
 				#endif
 
 				ensure(IsInGameThread());

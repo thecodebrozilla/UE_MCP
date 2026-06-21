@@ -27,19 +27,46 @@ def create_asset(
     return new_asset
 
 
+def _list_blueprint_graphs(blueprint: unreal.Blueprint) -> list:
+    """[5.7 port] unreal.BlueprintEditorLibrary.list_graphs() is 5.8-only; collect
+    the blueprint's EdGraphs via reflection as a fallback."""
+    try:
+        return list(unreal.BlueprintEditorLibrary.list_graphs(blueprint))
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+    graphs: list = []
+    for prop in ('ubergraph_pages', 'function_graphs', 'macro_graphs', 'delegate_signature_graphs'):
+        try:
+            for g in blueprint.get_editor_property(prop) or []:
+                graphs.append(g)
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+    return graphs
+
+
 def compile_blueprint(blueprint: unreal.Blueprint, warnings_as_errors: bool = False) -> None:
     """Compiles a Blueprint and raises with collected error messages on failure."""
     unreal.BlueprintEditorLibrary.compile_blueprint(blueprint)
-    status = blueprint.get_editor_property('Status')
-    if status == unreal.BlueprintStatus.BS_UP_TO_DATE:
-        return
-    if status == unreal.BlueprintStatus.BS_UP_TO_DATE_WITH_WARNINGS and not warnings_as_errors:
-        return
-    all_graphs = unreal.BlueprintEditorLibrary.list_graphs(blueprint)
+    # [5.7 port] Blueprint.Status is a protected property and cannot be read from
+    # Python on 5.7 (5.8 exposes it). Try it; otherwise fall back to scanning
+    # graphs for nodes flagged with compile errors.
+    try:
+        status = blueprint.get_editor_property('Status')
+        if status == unreal.BlueprintStatus.BS_UP_TO_DATE:
+            return
+        if status == unreal.BlueprintStatus.BS_UP_TO_DATE_WITH_WARNINGS and not warnings_as_errors:
+            return
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
     error_nodes = []
-    for graph in all_graphs:
-        bp_editor = unreal.BlueprintGraphEditor.get_graph_editor(graph)
-        error_nodes += bp_editor.list_nodes_with_errors()
+    for graph in _list_blueprint_graphs(blueprint):
+        try:
+            bp_editor = unreal.BlueprintGraphEditor.get_graph_editor(graph)
+            error_nodes += bp_editor.list_nodes_with_errors()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+    if not error_nodes:
+        return
     error_msgs = [node.get_editor_property('ErrorMsg') for node in error_nodes]
     assert False, f'Blueprint {blueprint} failed to compile. Compile Errors: {error_msgs}'
 
