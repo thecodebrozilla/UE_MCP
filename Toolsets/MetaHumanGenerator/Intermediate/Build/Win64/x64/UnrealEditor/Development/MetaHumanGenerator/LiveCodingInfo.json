@@ -1,0 +1,11 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.MetaHumanGenerator.cpp.obj": [
+			"MetaHumanGenerator.gen.cpp.obj",
+			"MetaHumanGenerator.init.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"MetaHumanGenerator.cpp.obj"
+		]
+	}
+}

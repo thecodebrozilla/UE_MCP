@@ -1,0 +1,17 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.SlateInspectorToolset.cpp.obj": [
+			"SlateInspectorToolset.gen.cpp.obj",
+			"SlateInspectorToolset.init.gen.cpp.obj",
+			"SlateInspectorToolsetSubsystem.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"SlateInspectorToolset.cpp.obj",
+			"SlateInspectorToolsetModule.cpp.obj",
+			"SlateInspectorToolsetObserverManager.cpp.obj",
+			"SlateInspectorToolsetRefCache.cpp.obj",
+			"SlateInspectorToolsetSnapshotRenderer.cpp.obj",
+			"SlateInspectorToolsetSubsystem.cpp.obj"
+		]
+	}
+}

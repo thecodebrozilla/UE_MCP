@@ -1,0 +1,25 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\source\\modelcontextprotocol\\private\\modelcontextprotocolsession.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\coreuobject\\sharedpch.coreuobject.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\modelcontextprotocol\\definitions.modelcontextprotocol.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\source\\modelcontextprotocol\\public\\modelcontextprotocolsession.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\source\\modelcontextprotocol\\public\\modelcontextprotocol.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\source\\modelcontextprotocol\\public\\modelcontextprotocolcapabilities.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\unrealeditor\\inc\\modelcontextprotocol\\uht\\modelcontextprotocolcapabilities.generated.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpresultcallback.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpserverresponse.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpserverconstants.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpserverhttpversion.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\unrealeditor\\inc\\modelcontextprotocol\\uht\\modelcontextprotocolsession.generated.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\json\\public\\dom\\jsonvalue.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\json\\public\\serialization\\jsontypes.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\unrealeditor\\inc\\modelcontextprotocol\\uht\\modelcontextprotocolsession.gen.cpp"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

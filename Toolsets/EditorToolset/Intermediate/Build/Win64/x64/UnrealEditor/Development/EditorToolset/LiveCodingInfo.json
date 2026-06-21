@@ -1,0 +1,14 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.EditorToolset.cpp.obj": [
+			"EditorToolset.init.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"BitmapAnnotation.cpp.obj",
+			"KismetSystemLibraryCompat.cpp.obj",
+			"EditorAppToolset.cpp.obj",
+			"EditorToolsetModule.cpp.obj",
+			"LogsToolset.cpp.obj"
+		]
+	}
+}

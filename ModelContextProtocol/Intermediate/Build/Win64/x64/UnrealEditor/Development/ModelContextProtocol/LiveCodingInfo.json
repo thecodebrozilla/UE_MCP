@@ -1,0 +1,20 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.ModelContextProtocol.cpp.obj": [
+			"ModelContextProtocol.init.gen.cpp.obj",
+			"ModelContextProtocolMetaData.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"IModelContextProtocolResourceProvider.cpp.obj",
+			"ModelContextProtocol.cpp.obj",
+			"ModelContextProtocolAnalytics.cpp.obj",
+			"ModelContextProtocolCapabilities.cpp.obj",
+			"ModelContextProtocolModule.cpp.obj",
+			"ModelContextProtocolResources.cpp.obj",
+			"ModelContextProtocolServer.cpp.obj",
+			"ModelContextProtocolSession.cpp.obj",
+			"ModelContextProtocolToolResults.cpp.obj",
+			"ModelContextProtocolServerAccessor.cpp.obj"
+		]
+	}
+}

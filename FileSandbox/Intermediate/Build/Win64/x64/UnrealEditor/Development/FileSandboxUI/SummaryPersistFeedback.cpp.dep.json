@@ -1,0 +1,18 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\private\\persist\\feedback\\summarypersistfeedback.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\filesandboxui\\definitions.filesandboxui.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\public\\persist\\feedback\\summarypersistfeedback.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\public\\persist\\feedback\\persistsummary.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\interface\\ipersistfeedback.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\gatheredfilechanges.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandboxfilechange.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

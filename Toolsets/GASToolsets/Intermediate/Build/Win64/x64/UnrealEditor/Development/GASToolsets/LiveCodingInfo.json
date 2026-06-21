@@ -1,0 +1,14 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.GASToolsets.cpp.obj": [
+			"GASToolsets.init.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"AbilitySystemInspectorToolset.cpp.obj",
+			"AttributeSetToolset.cpp.obj",
+			"KismetSystemLibraryCompat.cpp.obj",
+			"GameplayCueToolset.cpp.obj",
+			"GASToolsets.cpp.obj"
+		]
+	}
+}

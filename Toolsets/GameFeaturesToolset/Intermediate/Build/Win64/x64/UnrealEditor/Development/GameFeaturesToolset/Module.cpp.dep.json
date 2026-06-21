@@ -1,0 +1,23 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\gamefeaturestoolset\\source\\gamefeaturestoolset\\private\\module.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\gamefeaturestoolset\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\gamefeaturestoolset\\definitions.gamefeaturestoolset.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\gamefeaturestoolset\\source\\gamefeaturestoolset\\private\\gamefeaturestoolset.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolsetdefinition.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolsetdefinition.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\gamefeaturestoolset\\intermediate\\build\\win64\\unrealeditor\\inc\\gamefeaturestoolset\\uht\\gamefeaturestoolset.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\utoolsetregistry.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresultstring.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresult.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresult.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresultstring.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\utoolsetregistry.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

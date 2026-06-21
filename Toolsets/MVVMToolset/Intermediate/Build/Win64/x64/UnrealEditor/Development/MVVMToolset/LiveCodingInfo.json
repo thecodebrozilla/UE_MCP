@@ -1,0 +1,12 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.MVVMToolset.cpp.obj": [
+			"MVVMToolset.init.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"KismetSystemLibraryCompat.cpp.obj",
+			"MVVMToolset.cpp.obj",
+			"MVVMToolsetModule.cpp.obj"
+		]
+	}
+}

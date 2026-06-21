@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\mcpclienttoolset\\source\\mcpclienttoolset\\private\\mcpclienttoolset\\module.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\mcpclienttoolset\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\mcpclienttoolset\\definitions.mcpclienttoolset.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\mcpclienttoolset\\source\\mcpclienttoolset\\private\\mcpclienttoolset\\module.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

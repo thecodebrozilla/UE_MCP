@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\private\\data\\versioninfo.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\filesandboxcore\\definitions.filesandboxcore.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\data\\versioninfo.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\intermediate\\build\\win64\\unrealeditor\\inc\\filesandboxcore\\uht\\versioninfo.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-StateTreeToolset.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"B:/Unreal Projects/UE_MCP/Intermediate/Build/Win64/x64/UE_MCPEditor/Development/Core/SharedPCH.Core.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/StateTreeToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/StateTreeToolset/Module.StateTreeToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/StateTreeToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/StateTreeToolset/StateTreeToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/StateTreeToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/StateTreeToolset/Default.rc2.res"
+/OUT:"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/StateTreeToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/StateTreeToolset/UnrealEditor-StateTreeToolset.lib"

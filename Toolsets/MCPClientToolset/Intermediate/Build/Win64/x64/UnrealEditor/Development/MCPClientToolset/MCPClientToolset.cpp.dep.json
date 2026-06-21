@@ -1,0 +1,35 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\mcpclienttoolset\\source\\mcpclienttoolset\\private\\mcpclienttoolset\\mcpclienttoolset.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\mcpclienttoolset\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\mcpclienttoolset\\definitions.mcpclienttoolset.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\mcpclienttoolset\\source\\mcpclienttoolset\\public\\mcpclienttoolset\\mcpclienttoolset.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpresultcallback.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpserverresponse.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpserverconstants.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpserverhttpversion.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httproutehandle.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpserverrequest.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httppath.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httprequesthandler.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\interfaces\\ihttprequest.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\interfaces\\ihttpbase.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolset.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\httpmodule.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\ihttprouter.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\httpserver\\public\\httpservermodule.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\interfaces\\ihttpresponse.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\interfaces\\ihttpresponsecodes.inl",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\interfaces\\ihttpresponsecodes.inl",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\platformhttp.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\windows\\windowsplatformhttp.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\online\\http\\public\\genericplatform\\genericplatformhttp.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\mcpclienttoolset\\source\\mcpclienttoolset\\private\\mcpclienttoolset\\module.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

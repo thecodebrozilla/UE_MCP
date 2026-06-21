@@ -1,0 +1,16 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\private\\tests\\transformconvertertest.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\toolsetregistry\\definitions.toolsetregistry.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\private\\tests\\transformconvertertest.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\transformconvertertest.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\private\\toolsetregistry\\toolsetjson.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

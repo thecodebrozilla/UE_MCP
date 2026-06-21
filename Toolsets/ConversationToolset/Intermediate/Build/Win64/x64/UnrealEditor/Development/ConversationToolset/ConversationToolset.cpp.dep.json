@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\conversationtoolset\\source\\conversationtoolset\\private\\conversationtoolset.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\core\\sharedpch.core.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\conversationtoolset\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\conversationtoolset\\definitions.conversationtoolset.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\conversationtoolset\\source\\conversationtoolset\\public\\conversationtoolset.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

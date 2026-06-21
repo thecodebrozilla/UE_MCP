@@ -1,0 +1,20 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-PCGToolset.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"B:/Unreal Projects/UE_MCP/Intermediate/Build/Win64/x64/UE_MCPEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/Module.PCGToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/PCGAttributePropertySelectorConverter.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/PCGSpatialToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/PCGToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/PCGToolsetAsync.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/PCGToolsetLibraryCore.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/PCGToolsetModule.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/PCGToolsetSettings.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/KismetSystemLibraryCompat.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/Default.rc2.res"
+/OUT:"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PCGToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PCGToolset/UnrealEditor-PCGToolset.lib"

@@ -1,0 +1,35 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\automationtesttoolset\\source\\automationtesttoolset\\private\\automationtesttoolset.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\automationtesttoolset\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\automationtesttoolset\\definitions.automationtesttoolset.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\automationtesttoolset\\source\\automationtesttoolset\\public\\automationtesttoolset.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolsetdefinition.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolsetdefinition.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\automationtesttoolset\\intermediate\\build\\win64\\unrealeditor\\inc\\automationtesttoolset\\uht\\automationtesttoolset.generated.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\developer\\automationcontroller\\public\\automationgroupfilter.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\developer\\automationcontroller\\public\\iautomationreport.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\automationtest\\public\\automationtestexcludelist.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\automationtest\\public\\automationtestplatform.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\automationtest\\uht\\automationtestplatform.generated.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\automationtest\\uht\\automationtestexcludelist.generated.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\automationtest\\public\\automationstate.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\automationtest\\uht\\automationstate.generated.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\automationcontroller\\uht\\iautomationreport.generated.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\developer\\automationcontroller\\public\\automationcontrollersettings.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\automationcontroller\\uht\\automationcontrollersettings.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\automationtesttoolset\\source\\automationtesttoolset\\public\\automationtesttoolsetsubsystem.h",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\developer\\automationcontroller\\public\\iautomationcontrollermanager.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresultstring.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresult.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresult.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresultstring.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsets\\automationtesttoolset\\intermediate\\build\\win64\\unrealeditor\\inc\\automationtesttoolset\\uht\\automationtesttoolsetsubsystem.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

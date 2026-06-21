@@ -1,0 +1,9 @@
+{
+	"BuildId": "47537391",
+	"Modules": 
+	{
+		"ModelContextProtocol": "UnrealEditor-ModelContextProtocol.dll",
+		"ModelContextProtocolEditor": "UnrealEditor-ModelContextProtocolEditor.dll",
+		"ModelContextProtocolEngine": "UnrealEditor-ModelContextProtocolEngine.dll"
+	}
+}

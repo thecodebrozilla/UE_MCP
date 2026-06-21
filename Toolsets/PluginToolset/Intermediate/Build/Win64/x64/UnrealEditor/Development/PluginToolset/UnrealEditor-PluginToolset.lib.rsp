@@ -1,0 +1,15 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-PluginToolset.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"B:/Unreal Projects/UE_MCP/Intermediate/Build/Win64/x64/UE_MCPEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PluginToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PluginToolset/Module.PluginToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PluginToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PluginToolset/PluginToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PluginToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PluginToolset/PluginToolsetModule.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PluginToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PluginToolset/KismetSystemLibraryCompat.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PluginToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PluginToolset/Default.rc2.res"
+/OUT:"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PluginToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/PluginToolset/UnrealEditor-PluginToolset.lib"

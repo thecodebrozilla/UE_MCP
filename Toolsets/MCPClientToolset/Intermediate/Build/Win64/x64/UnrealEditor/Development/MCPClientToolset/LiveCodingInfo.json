@@ -1,0 +1,15 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.MCPClientToolset.cpp.obj": [
+			"MCPClientToolset.init.gen.cpp.obj",
+			"MCPClientToolsetSubsystem.gen.cpp.obj",
+			"MCPToolsetSettings.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"MCPClientToolset.cpp.obj",
+			"MCPClientToolsetSubsystem.cpp.obj",
+			"MCPToolsetSettings.cpp.obj",
+			"Module.cpp.obj"
+		]
+	}
+}

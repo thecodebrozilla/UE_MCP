@@ -1,0 +1,26 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\private\\tests\\toolcallasyncresultstringtest.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\toolsetregistry\\definitions.toolsetregistry.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresultstring.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresult.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresult.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresultstring.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\private\\tests\\toolcallasyncresulttest.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresultfuturehandler.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\jsonvalueorerror.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresultfuturehandler.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolcallasyncresultvoid.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresultvoid.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\source\\toolsetregistry\\public\\toolsetregistry\\toolsetdefinition.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolsetdefinition.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\toolsetregistry\\intermediate\\build\\win64\\unrealeditor\\inc\\toolsetregistry\\uht\\toolcallasyncresulttest.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

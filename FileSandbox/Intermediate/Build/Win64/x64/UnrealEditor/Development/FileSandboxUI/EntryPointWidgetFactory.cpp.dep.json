@@ -1,0 +1,24 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\private\\entrypoint\\entrypointwidgetfactory.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\filesandboxui\\definitions.filesandboxui.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\public\\entrypoint\\entrypointwidgetfactory.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\private\\entrypoint\\externalsandboxactiveviewmodel.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\isandboxinstance.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\gatheredfilechanges.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandbox\\revertargs.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandbox\\persistresult.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\argsfwds.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandboxedfilechangeinfo.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandboxfilechange.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\public\\entrypoint\\iexternalsandboxactiveviewmodel.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\private\\entrypoint\\widgets\\sexternalsandboxactiveoverlay.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

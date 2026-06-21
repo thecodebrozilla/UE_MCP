@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\source\\modelcontextprotocol\\private\\modelcontextprotocol.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\coreuobject\\sharedpch.coreuobject.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\modelcontextprotocol\\definitions.modelcontextprotocol.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\source\\modelcontextprotocol\\public\\modelcontextprotocol.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,20 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-ModelContextProtocolEngine.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"B:/Unreal Projects/UE_MCP/Intermediate/Build/Win64/x64/UE_MCPEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/Module.ModelContextProtocolEngine.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolClientConfig.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolEngineMetaData.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolEngineModule.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolEngineToolResults.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolSettings.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolToolAsyncAction.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolToolLibrary.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/ModelContextProtocolToolUtils.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/Default.rc2.res"
+/OUT:"B:/Unreal Projects/UE_MCP/Plugins/ModelContextProtocol/Intermediate/Build/Win64/x64/UnrealEditor/Development/ModelContextProtocolEngine/UnrealEditor-ModelContextProtocolEngine.lib"

@@ -1,0 +1,16 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-MCPClientToolset.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"B:/Unreal Projects/UE_MCP/Intermediate/Build/Win64/x64/UE_MCPEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/MCPClientToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/MCPClientToolset/Module.MCPClientToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/MCPClientToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/MCPClientToolset/MCPClientToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/MCPClientToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/MCPClientToolset/MCPClientToolsetSubsystem.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/MCPClientToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/MCPClientToolset/MCPToolsetSettings.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/MCPClientToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/MCPClientToolset/Module.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/MCPClientToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/MCPClientToolset/Default.rc2.res"
+/OUT:"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/MCPClientToolset/Intermediate/Build/Win64/x64/UnrealEditor/Development/MCPClientToolset/UnrealEditor-MCPClientToolset.lib"

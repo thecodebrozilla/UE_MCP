@@ -1,0 +1,19 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\modelcontextprotocol\\module.modelcontextprotocol.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\coreuobject\\sharedpch.coreuobject.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\modelcontextprotocol\\definitions.modelcontextprotocol.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\unrealeditor\\inc\\modelcontextprotocol\\uht\\modelcontextprotocol.init.gen.cpp",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\unrealeditor\\inc\\modelcontextprotocol\\uht\\modelcontextprotocolmetadata.gen.cpp",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\source\\modelcontextprotocol\\public\\modelcontextprotocolmetadata.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\unrealeditor\\inc\\modelcontextprotocol\\uht\\modelcontextprotocolmetadata.generated.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\modelcontextprotocol\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\modelcontextprotocol\\permoduleinline.gen.cpp",
+            "c:\\program files\\epic games\\ue_5.7\\engine\\source\\runtime\\core\\public\\hal\\permoduleinline.inl"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

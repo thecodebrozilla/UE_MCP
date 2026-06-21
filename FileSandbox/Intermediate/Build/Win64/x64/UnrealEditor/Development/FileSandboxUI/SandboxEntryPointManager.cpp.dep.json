@@ -1,0 +1,29 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\private\\entrypoint\\sandboxentrypointmanager.cpp",
+        "ProvidedModule": "",
+        "PCH": "b:\\unreal projects\\ue_mcp\\intermediate\\build\\win64\\x64\\ue_mcpeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.valexpapi.cpp20.h.pch",
+        "Includes": [
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\filesandboxui\\definitions.filesandboxui.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\private\\entrypoint\\sandboxentrypointmanager.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\public\\entrypoint\\isandboxentrypointregistry.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxui\\public\\entrypoint\\isandboxentrypoint.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\ifilesandboxcoremodule.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\isandboxmanager.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\argsfwds.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\gatheredfilechanges.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\manager\\leavesandboxargs.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandbox\\persistargs.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\manager\\leavesandboxresult.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\manager\\sandboxcreationresult.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\manager\\loadsandboxerror.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\manager\\newsandboxerror.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandboxedfilechangeinfo.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\types\\sandboxfilechange.h",
+            "b:\\unreal projects\\ue_mcp\\plugins\\filesandbox\\source\\filesandboxcore\\public\\utils\\sandboxdirectoryutils.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

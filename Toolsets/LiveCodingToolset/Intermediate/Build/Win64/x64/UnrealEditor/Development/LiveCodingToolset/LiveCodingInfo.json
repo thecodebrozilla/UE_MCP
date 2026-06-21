@@ -1,0 +1,14 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.LiveCodingToolset.cpp.obj": [
+			"LiveCodingToolset.gen.cpp.obj",
+			"LiveCodingToolset.init.gen.cpp.obj",
+			"LiveCodingToolsetSubsystem.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"LiveCodingToolset.cpp.obj",
+			"LiveCodingToolsetModule.cpp.obj",
+			"LiveCodingToolsetSubsystem.cpp.obj"
+		]
+	}
+}

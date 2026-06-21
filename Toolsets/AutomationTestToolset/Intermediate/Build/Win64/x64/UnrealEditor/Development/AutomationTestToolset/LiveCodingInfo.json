@@ -1,0 +1,14 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.AutomationTestToolset.cpp.obj": [
+			"AutomationTestToolset.gen.cpp.obj",
+			"AutomationTestToolset.init.gen.cpp.obj",
+			"AutomationTestToolsetSubsystem.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"AutomationTestToolset.cpp.obj",
+			"AutomationTestToolsetModule.cpp.obj",
+			"AutomationTestToolsetSubsystem.cpp.obj"
+		]
+	}
+}

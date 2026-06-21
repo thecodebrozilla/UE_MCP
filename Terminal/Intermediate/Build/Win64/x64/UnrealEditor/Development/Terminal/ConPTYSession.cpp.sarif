@@ -1,0 +1,94 @@
+{
+    "version": "2.1.0",
+    "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+    "runs": [
+        {
+            "results": [
+                {
+                    "ruleId": "C4191",
+                    "message": {
+                        "text": "'reinterpret_cast': unsafe conversion from 'FARPROC' to '`anonymous-namespace'::FConPTYAPI::CreatePseudoConsoleFunc'\n        Making a function call using the resulting pointer may cause your program to fail"
+                    },
+                    "analysisTarget": {
+                        "uri": "file:///B:/Unreal Projects/UE_MCP/Plugins/Terminal/Source/Terminal/Private/ConPTYSession.cpp"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file:///B:/Unreal Projects/UE_MCP/Plugins/Terminal/Source/Terminal/Private/ConPTYSession.cpp"
+                                },
+                                "region": {
+                                    "startLine": 86,
+                                    "startColumn": 29,
+                                    "snippet": {
+                                        "text": "\t\tAPI.CreatePseudoConsole = reinterpret_cast<FConPTYAPI::CreatePseudoConsoleFunc>("
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "C4191",
+                    "message": {
+                        "text": "'reinterpret_cast': unsafe conversion from 'FARPROC' to '`anonymous-namespace'::FConPTYAPI::ResizePseudoConsoleFunc'\n        Making a function call using the resulting pointer may cause your program to fail"
+                    },
+                    "analysisTarget": {
+                        "uri": "file:///B:/Unreal Projects/UE_MCP/Plugins/Terminal/Source/Terminal/Private/ConPTYSession.cpp"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file:///B:/Unreal Projects/UE_MCP/Plugins/Terminal/Source/Terminal/Private/ConPTYSession.cpp"
+                                },
+                                "region": {
+                                    "startLine": 88,
+                                    "startColumn": 29,
+                                    "snippet": {
+                                        "text": "\t\tAPI.ResizePseudoConsole = reinterpret_cast<FConPTYAPI::ResizePseudoConsoleFunc>("
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "C4191",
+                    "message": {
+                        "text": "'reinterpret_cast': unsafe conversion from 'FARPROC' to '`anonymous-namespace'::FConPTYAPI::ClosePseudoConsoleFunc'\n        Making a function call using the resulting pointer may cause your program to fail"
+                    },
+                    "analysisTarget": {
+                        "uri": "file:///B:/Unreal Projects/UE_MCP/Plugins/Terminal/Source/Terminal/Private/ConPTYSession.cpp"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file:///B:/Unreal Projects/UE_MCP/Plugins/Terminal/Source/Terminal/Private/ConPTYSession.cpp"
+                                },
+                                "region": {
+                                    "startLine": 90,
+                                    "startColumn": 28,
+                                    "snippet": {
+                                        "text": "\t\tAPI.ClosePseudoConsole = reinterpret_cast<FConPTYAPI::ClosePseudoConsoleFunc>("
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "tool": {
+                "driver": {
+                    "name": "MSVC",
+                    "shortDescription": {
+                        "text": "Microsoft Visual C++ Compiler Warnings/Errors"
+                    },
+                    "informationUri": "https://docs.microsoft.com/cpp/error-messages/compiler-errors-1/c-cpp-build-errors"
+                }
+            }
+        }
+    ]
+}

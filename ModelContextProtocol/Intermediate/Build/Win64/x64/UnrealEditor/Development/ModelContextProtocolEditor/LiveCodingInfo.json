@@ -1,0 +1,17 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.ModelContextProtocolEditor.cpp.obj": [
+			"ModelContextProtocolAssetDefinitions.gen.cpp.obj",
+			"ModelContextProtocolEditor.init.gen.cpp.obj",
+			"PerModuleInline.gen.cpp.obj",
+			"ModelContextProtocolAssetDefinitions.cpp.obj",
+			"ModelContextProtocolEditor.cpp.obj",
+			"ModelContextProtocolEditorToolLibrary.cpp.obj",
+			"ModelContextProtocolToolHashMappingCommandlet.cpp.obj",
+			"ModelContextProtocolToolLibraryFactory.cpp.obj",
+			"ModelContextProtocolToolSearch.cpp.obj",
+			"ModelContextProtocolToolsetRegistryAdapter.cpp.obj"
+		]
+	}
+}

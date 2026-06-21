@@ -1,0 +1,15 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-PhysicsToolsets.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"B:/Unreal Projects/UE_MCP/Intermediate/Build/Win64/x64/UE_MCPEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PhysicsToolsets/Intermediate/Build/Win64/x64/UnrealEditor/Development/PhysicsToolsets/Module.PhysicsToolsets.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PhysicsToolsets/Intermediate/Build/Win64/x64/UnrealEditor/Development/PhysicsToolsets/KismetSystemLibraryCompat.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PhysicsToolsets/Intermediate/Build/Win64/x64/UnrealEditor/Development/PhysicsToolsets/Module.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PhysicsToolsets/Intermediate/Build/Win64/x64/UnrealEditor/Development/PhysicsToolsets/PhysicsAssetToolset.cpp.obj"
+"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PhysicsToolsets/Intermediate/Build/Win64/x64/UnrealEditor/Development/PhysicsToolsets/Default.rc2.res"
+/OUT:"B:/Unreal Projects/UE_MCP/Plugins/Toolsets/PhysicsToolsets/Intermediate/Build/Win64/x64/UnrealEditor/Development/PhysicsToolsets/UnrealEditor-PhysicsToolsets.lib"
