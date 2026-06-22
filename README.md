@@ -1,10 +1,6 @@
 # UE_MCP Plugins
 
-A suite of Unreal Engine plugins that expose the editor to AI assistants through
-the **Model Context Protocol (MCP)**. The MCP server runs inside the editor and
-surfaces a registry of "toolsets" — collections of Python-backed tool calls that
-let an assistant inspect and author Blueprints, actors, Niagara systems, GAS,
-UMG, and much more.
+Ported Unreal Engine MCP from 5.8 to 6.7 (eventually will do earlier versions too) along with most toolkists.
 
 > **Engine:** UE 5.7. Several plugins are backports of UE 5.8 APIs so the suite
 > runs on 5.7. See [`BlueprintGraphEditorPort`](BlueprintGraphEditorPort) and
