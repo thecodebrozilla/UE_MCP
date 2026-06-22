@@ -1,6 +1,6 @@
 # UE_MCP Plugins
 
-Ported Unreal Engine MCP from 5.8 to 6.7 (eventually will do earlier versions too) along with most toolkists.
+Ported Unreal Engine MCP from 5.8 to 5.7 (eventually will do earlier versions too) along with most toolkists.
 
 > **Engine:** UE 5.7. Several plugins are backports of UE 5.8 APIs so the suite
 > runs on 5.7. See [`BlueprintGraphEditorPort`](BlueprintGraphEditorPort) and
