@@ -1,8 +1,0 @@
-{
-	"BuildId": "47537391",
-	"Modules": 
-	{
-		"FileSandboxCore": "UnrealEditor-FileSandboxCore.dll",
-		"FileSandboxUI": "UnrealEditor-FileSandboxUI.dll"
-	}
-}

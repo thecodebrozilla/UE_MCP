@@ -1,9 +1,0 @@
-{
-	"RemapUnityFiles": 
-	{
-		"Module.StateTreeToolset.cpp.obj": [
-			"PerModuleInline.gen.cpp.obj",
-			"StateTreeToolset.cpp.obj"
-		]
-	}
-}

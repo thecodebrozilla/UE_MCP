@@ -1,9 +1,0 @@
-{
-	"RemapUnityFiles": 
-	{
-		"Module.AnimationAssistantToolset.cpp.obj": [
-			"PerModuleInline.gen.cpp.obj",
-			"AnimationAssistantToolset.cpp.obj"
-		]
-	}
-}

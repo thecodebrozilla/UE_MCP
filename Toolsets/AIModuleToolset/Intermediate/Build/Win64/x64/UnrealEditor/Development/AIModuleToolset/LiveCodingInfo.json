@@ -1,9 +1,0 @@
-{
-	"RemapUnityFiles": 
-	{
-		"Module.AIModuleToolset.cpp.obj": [
-			"PerModuleInline.gen.cpp.obj",
-			"AIModuleToolset.cpp.obj"
-		]
-	}
-}
