@@ -13,7 +13,9 @@ from editor_toolset.toolsets.asset import import_asset
 # the tool signatures. What is missing on 5.7 is:
 #   * unreal.SimpleCurveKey - FSimpleCurveKey is USTRUCT() without BlueprintType and
 #     is not referenced by any reflected signature, so it is not exposed. Key data
-#     is therefore passed/returned as plain dicts {'time': float, 'value': float}.
+#     is therefore passed/returned as the CurveKey ustruct declared below (mirroring
+#     5.8's Array-of-struct shape; an Array-of-Map / list[dict] is not a valid UE
+#     reflected property type on 5.7).
 #   * the 5.8 DataTableFunctionLibrary curve-editing helpers
 #     (add_simple_curve_to_table, set_curve_table_row_default, remove_curve_table_row,
 #      rename_curve_table_row, add_curve_table_key, get_curve_table_keys,
@@ -23,6 +25,18 @@ from editor_toolset.toolsets.asset import import_asset
 #
 # Note: the shim is referenced inside method bodies (not at module scope) so this
 # module still imports even if BlueprintGraphEditorPort is absent.
+
+
+@unreal.ustruct()
+class CurveKey(unreal.StructBase):
+    """A single key (time/value pair) on a CurveTable row.
+
+    [5.7 port] Stand-in for the 5.8-only unreal.SimpleCurveKey so the curve tools
+    can take/return an Array-of-struct (which UE reflection supports on 5.7)
+    instead of an Array-of-Map.
+    """
+    time = unreal.uproperty(float)
+    value = unreal.uproperty(float)
 
 
 @unreal.uclass()
@@ -163,26 +177,26 @@ class CurveTableTools(unreal.ToolsetDefinition):
     @toolset_registry.tool_call
     @staticmethod
     def set_keys(curve_table: unreal.CurveTable, row_name: str,
-                 keys: list[dict[str, float]]) -> bool:
+                 keys: list[CurveKey]) -> bool:
         """Replaces all keys in a row with the provided list.
 
         Args:
             curve_table: The CurveTable to modify.
             row_name: The name of the row to modify.
-            keys: The keys to set in the row. Each key is a dict with 'time' and
-                'value' float entries, e.g. {'time': 0.0, 'value': 1.0}.
+            keys: The keys to set in the row, each a CurveKey with `time` and
+                `value` floats.
 
         Returns:
             True if all keys were set successfully.
         """
         CurveTableTools._ensure_row_exists(curve_table, row_name)
-        times = [float(k['time']) for k in keys]
-        values = [float(k['value']) for k in keys]
+        times = [float(k.time) for k in keys]
+        values = [float(k.value) for k in keys]
         return unreal.EditorToolsetCompatLibrary.curve_table_set_keys(curve_table, row_name, times, values)
 
     @toolset_registry.tool_call
     @staticmethod
-    def get_keys(curve_table: unreal.CurveTable, row_name: str) -> list[dict[str, float]]:
+    def get_keys(curve_table: unreal.CurveTable, row_name: str) -> list[CurveKey]:
         """Returns all keys for a row.
 
         Args:
@@ -190,12 +204,18 @@ class CurveTableTools(unreal.ToolsetDefinition):
             row_name: The name of the row to query.
 
         Returns:
-            A list of {'time': float, 'value': float} dicts, one per key.
+            A list of CurveKey (time/value), one per key.
         """
         CurveTableTools._ensure_row_exists(curve_table, row_name)
         times = list(unreal.EditorToolsetCompatLibrary.curve_table_get_key_times(curve_table, row_name))
         values = list(unreal.EditorToolsetCompatLibrary.curve_table_get_key_values(curve_table, row_name))
-        return [{'time': t, 'value': v} for t, v in zip(times, values)]
+        result = []
+        for t, v in zip(times, values):
+            key = CurveKey()
+            key.time = t
+            key.value = v
+            result.append(key)
+        return result
 
     @staticmethod
     def _ensure_row_exists(curve_table: unreal.CurveTable, row_name: str) -> None:
