@@ -1,8 +1,0 @@
-{
-	"BuildId": "47537391",
-	"Modules": 
-	{
-		"JsonUtilitiesEditor": "UnrealEditor-JsonUtilitiesEditor.dll",
-		"JsonUtilitiesSchema": "UnrealEditor-JsonUtilitiesSchema.dll"
-	}
-}

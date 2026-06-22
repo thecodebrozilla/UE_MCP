@@ -1,9 +1,0 @@
-{
-	"RemapUnityFiles": 
-	{
-		"Module.ConversationToolset.cpp.obj": [
-			"PerModuleInline.gen.cpp.obj",
-			"ConversationToolset.cpp.obj"
-		]
-	}
-}
