@@ -98,16 +98,42 @@ them requires a **source-built engine** (or the specific engine pieces below).
 > EULA. Only your own original shims + a patch that each recipient applies to
 > their **own** legitimately-obtained engine source is shareable.
 
-## Getting started
+## How to install
 
-1. Clone this repository into your project's `Plugins/` directory:
-   ```sh
-   git clone https://github.com/BodeSoftware/UE_MCP.git Plugins/UE_MCP
-   ```
-2. Enable the `ModelContextProtocol` plugin (and `AllToolsets`, or the specific
+Download the zip, extract it, and copy **all** of the plugin folders into a
+`Plugins/` directory in **one** of these two locations:
+
+- **Per project** — copy the folders into your project's `Plugins/` folder (next
+  to your `.uproject`), so each plugin lives at:
+  ```
+  YourProject/Plugins/<PluginName>/...
+  ```
+  If your project doesn't have a `Plugins/` folder yet, create one. Existing
+  plugins in that folder are left untouched.
+
+- **Per engine** — copy the folders into your engine install's
+  `Engine/Plugins/` folder, so each plugin lives at:
+  ```
+  <UE install>/Engine/Plugins/<PluginName>/...
+  ```
+  (e.g. `C:\Program Files\Epic Games\UE_5.7\Engine\Plugins\`). Installing here
+  makes the suite available to **every** project that uses that engine.
+
+Use the **per-project** location if you only want these plugins in one project;
+use the **per-engine** location to share them across all of your projects.
+
+After copying the files:
+
+1. Enable the `ModelContextProtocol` plugin (and `AllToolsets`, or the specific
    toolsets you need) in your project's plugin settings.
-3. Ensure `PythonScriptPlugin` is enabled — toolsets are Python-backed.
-4. Regenerate project files and build the editor target.
+2. Ensure `PythonScriptPlugin` is enabled — toolsets are Python-backed.
+3. Regenerate project files and build the editor target.
+
+> Prefer Git? You can instead clone this repository directly into your project's
+> `Plugins/` directory:
+> ```sh
+> git clone https://github.com/thecodebrozilla/UE_MCP.git Plugins/UE_MCP
+> ```
 
 ## Requirements
 
